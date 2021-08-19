@@ -48,6 +48,7 @@ export default {
   },
   computed: {
     dataManager () {
+      // TODO: This has changed slightly from the default implementation.
       return new ContentCollection(this.schema)
     },
     title () {
