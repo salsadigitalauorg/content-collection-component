@@ -101,7 +101,6 @@ module.exports = class ContentCollection {
     }
 
     if (contentTypeFilters) {
-      console.log('GABALLA')
       body.query.bool.filter.push(
          { terms: contentTypeFilters }
       )
