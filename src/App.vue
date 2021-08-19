@@ -17,9 +17,11 @@ export default {
       schema: {
         title: "hello world!",
         description: "Desc",
-        callToAction: { text: 'View all', url: 'text' },
+        callToAction: { text: 'View all', url: '/search' },
         internal: {
           itemsToLoad: 10,
+          // contentIds: [123,567],
+          contentTypes: ['landing_page'],
           custom: {
             'query': {
               'bool': {

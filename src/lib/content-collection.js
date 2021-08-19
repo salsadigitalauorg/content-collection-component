@@ -40,6 +40,9 @@ module.exports = class ContentCollection {
   // DSL Methods
   // ---------------------------------------------------------------------------
   getDSL () {
+    // Uncomment below to temporarily test simple query.
+    // return this.getSimpleDSL()
+
     if (this.config?.internal?.custom) {
       // Return Custom DSL if available.
       return this.config.internal.custom
@@ -52,7 +55,10 @@ module.exports = class ContentCollection {
   }
 
   getSimpleDSL () {
+    // Where should we set the site ID?
+    const siteId = '4'
     // contentIds
+    const contentIdFilters = this.getContentIds()
     // contentTypes
     const contentTypeFilters = this.getSimpleContentTypes()
     // contentFields
@@ -63,29 +69,63 @@ module.exports = class ContentCollection {
     const sortFilters = this.getSimpleSort()
     // itemsToLoad
 
-    const body = {}
-
-    if (contentTypeFilters.length > 0) {
-      body['query'] = {
+    const body = {
+      query: {
         bool: {
-          filter: [...contentTypeFilters]
+          must: [
+            {
+              "multi_match": {
+                'query': 'demo',
+                'type': 'phrase_prefix',
+                'fields': ['body', 'field_landing_page_summary', 'field_page_intro_text', 'field_paragraph_body', 'field_paragraph_summary', 'summary_processed', 'title']
+              }
+            },
+          ],
+          filter: [],
+          must_not: []
         }
-      }
+      },
+      sort: []
+    }
+
+    if (siteId) {
+      body.query.bool.filter.push(
+        { terms: { 'field_node_site': [siteId] } }
+      )
+    }
+
+    if (contentIdFilters.length > 0) {
+      body.query.bool.filter.push(
+        { terms: [...contentIdFilters] }
+      )
+    }
+
+    if (contentTypeFilters) {
+      body.query.bool.filter.push(
+         { terms: contentTypeFilters }
+      )
     }
 
     if (sortFilters.length > 0) {
-      body['sort'] = sortFilters
+      body.sort = sortFilters
     }
 
     return body
   }
 
-  getSimpleContentTypes () {
+  getContentIds () {
     const filters = []
-    if (this.config.internal?.contentTypes) {
-      filters.push({ "terms": { "type": this.config.internal.contentTypes } })
+    if (this.config.internal?.contentIds) {
+      filters.push({ "nid": this.config.internal.contentIds })
     }
     return filters
+  }
+
+  getSimpleContentTypes () {
+    if (this.config.internal?.contentTypes) {
+      return { "type": this.config.internal.contentTypes }
+    }
+    return null
   }
 
   getSimpleSort () {

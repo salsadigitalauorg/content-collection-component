@@ -1,5 +1,12 @@
 <template>
   <div class="app-content-collection">
+    <div v-if="debug" class="app-content-collection__debug">
+      <strong>Schema</strong>
+      <pre>{{ schema }}</pre>
+      <strong>Query</strong>
+      <pre>{{ debugSimpleDSL }}</pre>
+    </div>
+
     <h2 v-if="title">{{ title }}</h2>
     <p v-if="description">{{ description }}</p>
     <div>Call to Action</div>
@@ -44,6 +51,10 @@ export default {
     sidebar: {
       type: Boolean,
       default: false
+    },
+    debug: { 
+      type: Boolean,
+      default: true
     }
   },
   data () {
@@ -67,6 +78,9 @@ export default {
     },
     cta () {
       return this.dataManager.getCTA()
+    },
+    debugSimpleDSL () {
+      return this.dataManager.getSimpleDSL()
     }
   },
   methods: {
@@ -84,5 +98,11 @@ export default {
 <style lang="scss">
 .app-content-collection {
   background-color: pink;
+
+  &__debug {
+    background-color: #eee;
+    font-size: 90%;
+    padding: 5rem;
+  }
 }
 </style>
