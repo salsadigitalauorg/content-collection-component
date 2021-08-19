@@ -1,6 +1,6 @@
 <template>
   <div id="app">
-    <content-collection :schema="schema" />
+    <content-collection :schema="schema"></content-collection>
   </div>
 </template>
 
@@ -60,9 +60,26 @@ export default {
             // internal.sort
             'sort': [{ 'title.keyword': 'asc' }]
           }
+        },
+        interface: {
+          display: {
+            type: 'grid',
+            options: {
+              resultsCountText: 'Displaying {range} of {count} results',
+              loadingText: 'Loading',
+              noResultsText: 'Sorry! We couldn\'t find any matches',
+              errorText: 'Search isn\'t working right now, please try again later.'
+            }
+          }
         }
       }
     }
   }
 }
 </script>
+
+<style lang="scss">
+#app {
+  padding: 22px;
+}
+</style>

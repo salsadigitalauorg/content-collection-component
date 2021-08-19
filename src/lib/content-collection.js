@@ -36,6 +36,26 @@ module.exports = class ContentCollection {
     return this.getDSL()
   }
 
+  getDisplayType () {
+    return this.config?.interface?.display?.type
+  }
+
+  getDisplayResultCountText () {
+    return this.config?.interface?.display?.options?.resultsCountText
+  }
+
+  getDisplayLoadingText () {
+    return this.config?.interface?.display?.options?.loadingText
+  }
+
+  getDisplayNoResultsText () {
+    return this.config?.interface?.display?.options?.noResultsText
+  }
+
+  getDisplayErrorText () {
+    return this.config?.interface?.display?.options?.errorText
+  }
+
   // ---------------------------------------------------------------------------
   // DSL Methods
   // ---------------------------------------------------------------------------

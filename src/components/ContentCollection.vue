@@ -16,13 +16,22 @@
     <rpl-select />
     <!-- Grid -->
     <div>Search Results</div>
-    <rpl-search-results-layout>
-      <template v-slot:error>Error Msg</template>
-      <template v-slot:count>Count</template>
+    <rpl-search-results-layout
+      :searchResults="results"
+      :errorMsg="errorText"
+      :noResultsMsg="noResultsText"
+    >
+      <template v-slot:count>{{ resultCount }}</template>
       <template v-slot:sort>Sort</template>
-      <template v-slot:loading>loading</template>
-      <template v-slot:results>results</template>
-      <template v-slot:noresults>noresults</template>
+      <template v-slot:loading>{{ loadingText }}</template>
+      <template v-slot:results="scoped">
+        <!-- Results can be modified through slots. -->
+        <slot name="results" :searchResults="scoped.searchResults">
+          <rpl-col :colsBp="{ m: 6, l: 4, xxxl: 3 }" v-for="(result, i) in scoped.searchResults" :key="i + '-result'">
+            {{ result }}
+          </rpl-col>
+        </slot>
+      </template>
       <template v-slot:pagination>pagination</template>
     </rpl-search-results-layout>
     <hr/>
@@ -32,6 +41,7 @@
 <script>
 import { RplLink } from '@dpc-sdp/ripple-link'
 import { RplSelect, RplForm } from '@dpc-sdp/ripple-form'
+import { RplCol } from '@dpc-sdp/ripple-grid'
 import { RplSearchResultsLayout } from '@dpc-sdp/ripple-search'
 import provideChildCols from '@dpc-sdp/ripple-global/mixins/ProvideChildCols'
 import ContentCollection from '../lib/content-collection.js'
@@ -43,6 +53,7 @@ export default {
     RplLink,
     RplForm,
     RplSelect,
+    RplCol,
     RplSearchResultsLayout
   },
   props: {
@@ -52,7 +63,7 @@ export default {
       type: Boolean,
       default: false
     },
-    debug: { 
+    debug: {
       type: Boolean,
       default: true
     }
@@ -62,7 +73,8 @@ export default {
       state: {
         page: 1,
         itemsToLoad: 10
-      }
+      },
+      results: []
     }
   },
   computed: {
@@ -81,12 +93,25 @@ export default {
     },
     debugSimpleDSL () {
       return this.dataManager.getSimpleDSL()
+    },
+    resultCount () {
+      return this.dataManager.getDisplayResultCountText()
+    },
+    loadingText () {
+      return this.dataManager.getDisplayLoadingText()
+    },
+    noResultsText () {
+      return this.dataManager.getDisplayNoResultsText()
+    },
+    errorText () {
+      return this.dataManager.getDisplayErrorText()
     }
   },
   methods: {
     async getResults () {
       const response = await this.dataManager.getResults(this.state)
       console.table(response)
+      this.results = response
     }
   },
   mounted () {
