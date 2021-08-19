@@ -46,6 +46,14 @@ export default {
       default: false
     }
   },
+  data () {
+    return {
+      state: {
+        page: 1,
+        itemsToLoad: 10
+      }
+    }
+  },
   computed: {
     dataManager () {
       // TODO: This has changed slightly from the default implementation.
@@ -60,6 +68,15 @@ export default {
     cta () {
       return this.dataManager.getCTA()
     }
+  },
+  methods: {
+    async getResults () {
+      const response = await this.dataManager.getResults(this.state)
+      console.table(response)
+    }
+  },
+  mounted () {
+    this.getResults()
   }
 }
 </script>

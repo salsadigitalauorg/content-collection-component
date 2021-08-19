@@ -1,3 +1,5 @@
+const elasticSearch = require('./es.js');
+
 /**
  * ContentCollection
  * Provides an interface to query a content collection configuration.
@@ -94,5 +96,24 @@ module.exports = class ContentCollection {
       })
     }
     return filters
+  }
+
+  // ---------------------------------------------------------------------------
+  // Search Query Methods
+  // ---------------------------------------------------------------------------
+  async getResults (state) {
+    const internalDSL = this.getSearchQuery()
+    // TODO - Eventually this will connect into the tideSearch implementation.
+    const results = await elasticSearch(internalDSL)
+    return results.hits.hits.map(this.mapResult)
+  }
+
+  mapResult (item) {
+    const _source = item._source
+    return {
+      title: _source.title?.[0],
+      url: _source.url?.[0],
+      summary: _source.field_landing_page_summary?.[0]
+    }
   }
 }

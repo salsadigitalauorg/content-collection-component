@@ -16,6 +16,7 @@
     "@dpc-sdp/ripple-responsive-img": "^1.23.1",
     "@dpc-sdp/ripple-search": "^1.23.1",
     "core-js": "^3.6.5",
+    "elasticsearch": "^16.7.2",
     "vue": "^2.6.11"
   },
   "devDependencies": {
