@@ -56,6 +56,10 @@ module.exports = class ContentCollection {
     return this.config?.interface?.display?.options?.errorText
   }
 
+  getDisplayResultComponentType () {
+    return this.config?.interface?.display?.resultComponent?.type
+  }
+
   // ---------------------------------------------------------------------------
   // DSL Methods
   // ---------------------------------------------------------------------------

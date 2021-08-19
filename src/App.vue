@@ -15,8 +15,8 @@ export default {
   data () {
     return {
       schema: {
-        title: "hello world!",
-        description: "Desc",
+        title: "Content Collection",
+        description: "Aliqua commodo mollit enim nulla minim sit ut ullamco ea dolore non consectetur eu laborum.",
         callToAction: { text: 'View all', url: '/search' },
         internal: {
           itemsToLoad: 10,
@@ -69,6 +69,9 @@ export default {
               loadingText: 'Loading',
               noResultsText: 'Sorry! We couldn\'t find any matches',
               errorText: 'Search isn\'t working right now, please try again later.'
+            },
+            resultComponent: {
+              type: 'search-result'
             }
           }
         }

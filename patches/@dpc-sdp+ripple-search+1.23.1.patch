@@ -1,0 +1,13 @@
+diff --git a/node_modules/@dpc-sdp/ripple-search/SearchResultsLayout.vue b/node_modules/@dpc-sdp/ripple-search/SearchResultsLayout.vue
+index cde18c0..3b5122c 100644
+--- a/node_modules/@dpc-sdp/ripple-search/SearchResultsLayout.vue
++++ b/node_modules/@dpc-sdp/ripple-search/SearchResultsLayout.vue
+@@ -5,7 +5,7 @@
+     </div>
+     <template v-else>
+       <div class="rpl-search-results-layout__header">
+-        <div class="rpl-search-results-layout__info" v-if="range && count">
++        <div class="rpl-search-results-layout__info" v-if="(range && count) || !!$slots.count">
+           <slot name="count">
+             Displaying {{ range }} of {{ count }} results
+           </slot>
