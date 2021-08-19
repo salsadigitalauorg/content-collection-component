@@ -1,12 +1,11 @@
 <template>
   <div class="app-content-collection">
-    <pre>{{ schema }}</pre>
     <h2 v-if="title">{{ title }}</h2>
     <p v-if="description">{{ description }}</p>
     <div>Call to Action</div>
     <rpl-link :url="cta.url">{{ cta.text }}</rpl-link>
     <!-- Filters -->
-    <rpl-form />
+    <!-- <rpl-form /> -->
     <rpl-select />
     <!-- Grid -->
     <div>Search Results</div>
@@ -19,6 +18,7 @@
       <template v-slot:noresults>noresults</template>
       <template v-slot:pagination>pagination</template>
     </rpl-search-results-layout>
+    <hr/>
   </div>
 </template>
 

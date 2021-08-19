@@ -111,7 +111,12 @@ module.exports = class ContentCollection {
   mapResult (item) {
     const _source = item._source
     return {
+      nid: _source.nid?.[0],
       title: _source.title?.[0],
+      type: _source.type?.[0],
+      created: _source.created?.[0],
+      field_topic: _source.field_topic?.[0],
+      field_tags: _source.field_tags?.[0],
       url: _source.url?.[0],
       summary: _source.field_landing_page_summary?.[0]
     }

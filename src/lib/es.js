@@ -9,7 +9,7 @@ const SEARCH_AUTH_PASSWORD = 'ezh7BnY7'
 const url = 'https://' + SEARCH_HASH + '.' + SEARCH_URL
 const testESOptions = {
   host: url,
-  log: 'trace',
+  // log: 'trace',
   apiVersion: '7.6',
   httpAuth: `${SEARCH_AUTH_USERNAME}:${SEARCH_AUTH_PASSWORD}`
 }
