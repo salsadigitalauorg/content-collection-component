@@ -20,8 +20,11 @@ export default {
         callToAction: { text: 'View all', url: '/search' },
         internal: {
           itemsToLoad: 10,
-          // contentIds: [123,567],
+          // contentIds: ['7','15250',15211,14809],
           contentTypes: ['landing_page'],
+          sort: [
+            { field: 'created', direction: 'desc' }
+          ],
           custom: {
             'query': {
               'bool': {
