@@ -1,6 +1,6 @@
 <template>
   <div id="app">
-    <content-collection :schema="schema"></content-collection>
+    <content-collection :schema="schema" />
   </div>
 </template>
 
@@ -98,6 +98,7 @@ export default {
             },
             resultComponent: {
               type: 'search-result'
+              // type: 'basic-card'
             }
           }
         }

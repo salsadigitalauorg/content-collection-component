@@ -60,6 +60,30 @@ module.exports = class ContentCollection {
     return this.config?.interface?.display?.resultComponent?.type
   }
 
+  getDisplayResultComponentName () {
+    switch (this.getDisplayResultComponentType()) {
+      case 'search-result':
+        return 'rpl-search-result'
+        break
+      case 'basic-card':
+      default:
+        return 'rpl-card-promo'
+        break
+    }
+  }
+
+  getDisplayResultComponentColumns () {
+    switch (this.getDisplayResultComponentType()) {
+      case 'search-result':
+        return null
+        break
+      case 'basic-card':
+      default:
+        return { m: 6, l: 4, xxxl: 3 }
+        break
+    }
+  }
+
   // ---------------------------------------------------------------------------
   // DSL Methods
   // ---------------------------------------------------------------------------
@@ -191,6 +215,7 @@ module.exports = class ContentCollection {
         }
       })
       return {
+        model: 'sort',
         label: 'Sort',
         value: options[0].value,
         options: options
@@ -210,6 +235,7 @@ module.exports = class ContentCollection {
         }
       })
       return {
+        model: 'items_per_page',
         label: 'Items per page',
         value: options[0].value,
         options: options
@@ -219,6 +245,19 @@ module.exports = class ContentCollection {
     }
   }
 
+  getControlFields () {
+    const fields = []
+    const sort = this.getExposedSortForm()
+    if (sort) {
+      fields.push(sort)
+    }
+    const itemsToLoad = this.getExposedItemsToLoadForm()
+    if (itemsToLoad) {
+      fields.push(itemsToLoad)
+    }
+    return fields
+  }
+
   // ---------------------------------------------------------------------------
   // Search Query Methods
   // ---------------------------------------------------------------------------
@@ -226,20 +265,31 @@ module.exports = class ContentCollection {
     const internalDSL = this.getSearchQuery()
     // TODO - Eventually this will connect into the tideSearch implementation.
     const results = await elasticSearch(internalDSL)
-    return results.hits.hits.map(this.mapResult)
+    // TODO - Add some hardening around this to prevent errors.
+    return results.hits.hits.map(this.mapResult.bind(this))
   }
 
   mapResult (item) {
     const _source = item._source
-    return {
-      nid: _source.nid?.[0],
-      title: _source.title?.[0],
-      type: _source.type?.[0],
-      created: _source.created?.[0],
-      field_topic: _source.field_topic?.[0],
-      field_tags: _source.field_tags?.[0],
-      url: _source.url?.[0],
-      summary: _source.field_landing_page_summary?.[0]
+
+    switch (this.getDisplayResultComponentType()) {
+      case 'search-result':
+        return {
+          title: _source.title?.[0],
+          link: { linkText: _source.url?.[0], linkUrl: _source.url?.[0] },
+          date: _source.created?.[0],
+          description: _source.field_landing_page_summary?.[0]
+        }
+        break
+      case 'card':
+      default:
+        return {
+          title: _source.title?.[0],
+          link: { text: _source.url?.[0], url: _source.url?.[0] },
+          dateStart: _source.created?.[0],
+          summary: _source.field_landing_page_summary?.[0]
+        }
+        break
     }
   }
 }

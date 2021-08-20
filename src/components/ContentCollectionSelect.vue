@@ -3,11 +3,11 @@
     <label v-if="label" class="rpl-content-collection-select__label">{{ label }}</label>
     <rpl-select
       class="rpl-content-collection-select__select"
-      :state="selected"
-      :values="values || []"
+      :state="componentState"
+      :values="componentValues"
       :config="config"
       @rpl-select-update="update"
-    ></rpl-select>
+    />
   </div>
 </template>
 
@@ -25,37 +25,35 @@ export default {
       type: Array,
       validator: value => {
         return value.every(v => {
-          return typeof v === 'object' &&
-            v.hasOwnProperty('label') &&
-            v.hasOwnProperty('value')
+          return (typeof v === 'object' && v.hasOwnProperty('label') && v.hasOwnProperty('value'))
         })
       }
     },
     value: {
-      type: [Object, Array]
+      type: [Object, Array, Number, String]
+    }
+  },
+  data () {
+    const initialState = this.options.find(o => isEqual(o.value, this.value))
+    return {
+      selectedValue: this.value,
+      componentState: initialState ? `${kebabCase(initialState.label)}` : ''
     }
   },
   computed: {
-    selected () {
-      const match = this.options.find(o => isEqual(o.value, this.value))
-      if (match) {
-        return `${kebabCase(match.label)}`
+    componentValues () {
+      if (Array.isArray(this.options)) {
+        return this.options.map(o => ({id: `${kebabCase(o.label)}`, name: o.label }))
+      } else {
+        return []
       }
-    },
-    values () {
-      return this.options.map(o => {
-        return {
-          id: `${kebabCase(o.label)}`,
-          name: o.label
-        }
-      })
     }
   },
   methods: {
     update (val) {
-      const match = this.values.find(v => v.id === val)
+      const match = this.componentValues.find(v => v.id === val)
       if (match) {
-        this.selected = match.id
+        this.componentState = match.id
         const option = this.options.find(o => o.label === match.name)
         this.$emit('change', option.value)
       }
@@ -69,30 +67,10 @@ export default {
 @import "~@dpc-sdp/ripple-form/scss/form";
 
 $sort-label-ruleset: ('s', 1em, 'bold');
-$sort-select-width-m: 15rem;
-$sort-select-width-xs: 100%;
+
 .rpl-content-collection-select {
-  display: flex;
-  align-items: center;
   &__label {
     @include rpl_typography_ruleset($sort-label-ruleset);
-    margin-right: $rpl-space-3;
-    width: 20%;
-    @include rpl_breakpoint('m') {
-      width: auto;
-      min-width: 5rem;
-    }
-  }
-  &__select {
-    width: $sort-select-width-xs;
-    @include rpl_typography_ruleset($rpl-form-text-ruleset);
-
-    @include rpl_breakpoint('m') {
-      min-width: $sort-select-width-m;
-    }
-    .rpl-select__trigger {
-      padding: $rpl-space-3;
-    }
   }
 }
 </style>

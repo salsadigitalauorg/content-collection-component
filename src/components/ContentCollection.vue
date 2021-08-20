@@ -21,36 +21,27 @@
       <template v-slot:count>{{ resultCount }}</template>
       <template v-slot:sort>
         <rpl-content-collection-select
-          v-if="itemsToLoadForm"
-          v-bind="itemsToLoadForm"
-          @change="controlChange"
-        />
-        <rpl-content-collection-select
-          v-if="sortForm"
-          v-bind="sortForm"
-          @change="controlChange"
+          v-for="(fieldData, controlFieldId) in controlFields"
+          :key="`${controlFieldId}-control-form`"
+          v-bind="fieldData"
+          @change="controlChange(fieldData.model, $event)"
         />
       </template>
       <template v-slot:loading>{{ loadingText }}</template>
       <template v-slot:results="scoped">
         <!-- Results can be modified through slots. -->
         <slot name="results" :searchResults="scoped.searchResults">
-          <template v-if="resultType === 'card'">
-            <rpl-col :colsBp="{ m: 6, l: 4, xxxl: 3 }" v-for="(result, i) in scoped.searchResults" :key="i + '-result'">
-              {{ result }}
-            </rpl-col>
-          </template>
-          <template v-if="resultType === 'search-result'">
-            <rpl-col v-for="(result, i) in scoped.searchResults" :key="i + '-result'">
-              <rpl-search-result
-                class="app-content-collection__search-result"
-                :title="result.title"
-                :link="{ linkText: result.url, linkUrl: result.url }"
-                :date="result.created"
-                :description="result.summary"
-              />
-            </rpl-col>
-          </template>
+          <rpl-col
+            v-for="(result, i) in scoped.searchResults"
+            :key="`${i}-result`"
+            :colsBp="resultColumns"
+          >
+            <component
+              class="app-content-collection__search-result"
+              :is="resultComponentName"
+              v-bind="result"
+            />
+          </rpl-col>
         </slot>
       </template>
       <template v-slot:pagination>pagination</template>
@@ -64,9 +55,11 @@ import { RplLink } from '@dpc-sdp/ripple-link'
 import { RplForm } from '@dpc-sdp/ripple-form'
 import RplContentCollectionSelect from './ContentCollectionSelect.vue'
 import { RplCol } from '@dpc-sdp/ripple-grid'
-import { RplSearchResultsLayout, RplSearchResult } from '@dpc-sdp/ripple-search'
 import provideChildCols from '@dpc-sdp/ripple-global/mixins/ProvideChildCols'
 import ContentCollection from '../lib/content-collection.js'
+import { RplSearchResultsLayout, RplSearchResult } from '@dpc-sdp/ripple-search'
+import { RplCardPromo } from '@dpc-sdp/ripple-card'
+// TODO - We need to figure out how custom result components can be loaded.
 
 export default {
   name: 'AppContentCollection',
@@ -77,7 +70,8 @@ export default {
     RplContentCollectionSelect,
     RplCol,
     RplSearchResultsLayout,
-    RplSearchResult
+    RplSearchResult,
+    RplCardPromo
   },
   props: {
     schema: Object,
@@ -95,10 +89,12 @@ export default {
     const dataManager = new ContentCollection(this.schema)
     const sortForm = dataManager.getExposedSortForm()
     const itemsToLoadForm = dataManager.getExposedItemsToLoadForm()
+    const controlFields = dataManager.getControlFields()
     return {
       dataManager,
       sortForm,
       itemsToLoadForm,
+      controlFields,
       state: {
         page: 1,
         itemsToLoad: 10
@@ -196,8 +192,11 @@ export default {
     errorText () {
       return this.dataManager.getDisplayErrorText()
     },
-    resultType () {
-      return this.dataManager.getDisplayResultComponentType()
+    resultComponentName () {
+      return this.dataManager.getDisplayResultComponentName()
+    },
+    resultColumns () {
+      return this.dataManager.getDisplayResultComponentColumns()
     }
   },
   methods: {
@@ -206,8 +205,8 @@ export default {
       console.table(response)
       this.results = response
     },
-    controlChange (value) {
-      console.log(value)
+    controlChange (form, value) {
+      console.log(form, value)
     }
   },
   mounted () {
