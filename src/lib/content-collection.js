@@ -1,4 +1,5 @@
 const elasticSearch = require('./es.js');
+const moment = require('moment');
 
 /**
  * ContentCollection
@@ -114,6 +115,7 @@ module.exports = class ContentCollection {
     // includeCurrentPage
     // excludeIds
     // dateFilter
+    const dateRangeFilters = this.getSimpleDSLDateRange()
     // sort
     const sortFilters = this.getSimpleDSLSort()
     // itemsToLoad
@@ -122,7 +124,9 @@ module.exports = class ContentCollection {
       query: {
         bool: {
           must: [],
-          filter: [],
+          filter: [
+            { 'range': { 'created': { gte: '2021-08-18T00:00:00+10:00' } } }
+          ],
           must_not: []
         }
       },
@@ -152,6 +156,12 @@ module.exports = class ContentCollection {
         body.query.bool.filter.push(
           { 'terms': { [item.fieldName]: item.fieldConfig.values } } 
         )
+      })
+    }
+
+    if (dateRangeFilters.length > 0) {
+      dateRangeFilters.forEach(item => {
+        body.query.bool.filter.push(item)
       })
     }
 
@@ -196,6 +206,55 @@ module.exports = class ContentCollection {
       })
     }
     return filters
+  }
+
+  getSimpleDSLDateRange () {
+    const filters = []
+    if (this.config.internal?.dateFilter) {
+      const df = this.config.internal.dateFilter
+      var start = null
+      var end = null
+
+      switch (df.criteria) {
+        case 'range':
+          start = df.dateRangeStart
+          end = df.dateRangeEnd || df.dateRangeStart
+          break
+
+        case 'today':
+          start = this.getStartEndDates('day').start
+          end = this.getStartEndDates('day').end
+          break
+
+        case 'this_week':
+          start = this.getStartEndDates('week').start
+          end = this.getStartEndDates('week').end
+          break
+
+        case 'this_month':
+          start = this.getStartEndDates('month').start
+          end = this.getStartEndDates('month').end
+          break
+
+        default:
+          console.log('Criteria not supported')
+          break
+      }
+
+      if (start && end) {
+        filters.push({ 'range': { [df.startDateField]: { gte: start } } })
+        filters.push({ 'range': { [df.endDateField]: { lte: end } } })
+      }
+      
+      return filters
+    }
+  }
+
+  getStartEndDates (type) {
+    return {
+      start: moment().startOf(type).format(),
+      end: moment().endOf(type).format()
+    }
   }
 
   // ---------------------------------------------------------------------------
