@@ -20,7 +20,7 @@ export default {
         callToAction: { text: 'View all', url: '/search' },
         internal: {
           itemsToLoad: 10,
-          contentIds: ['7', '10', 15211, 14809],
+          // contentIds: ['7', '10', 15211, 14809],
           contentTypes: ['landing_page'],
           contentFields: {
             field_topic: { operator: 'AND', values: ['110', '439', '4223', '601'] },

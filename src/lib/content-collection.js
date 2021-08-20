@@ -122,7 +122,9 @@ module.exports = class ContentCollection {
       query: {
         bool: {
           must: [],
-          filter: [],
+          filter: [
+            { 'range': { 'created': { gte: '2021-08-18T00:00:00+10:00' } } }
+          ],
           must_not: []
         }
       },
