@@ -65,7 +65,7 @@ module.exports = class ContentCollection {
   // ---------------------------------------------------------------------------
   getDSL () {
     // Uncomment below to temporarily test simple query.
-    // return this.getSimpleDSL()
+    return this.getSimpleDSL()
 
     if (this.config?.internal?.custom) {
       // Return Custom DSL if available.
@@ -82,29 +82,22 @@ module.exports = class ContentCollection {
     // Where should we set the site ID?
     const siteId = '4'
     // contentIds
-    const contentIdFilters = this.getContentIds()
+    const contentIdFilters = this.getSimpleDSLContentIds()
     // contentTypes
-    const contentTypeFilters = this.getSimpleContentTypes()
+    const contentTypeFilters = this.getSimpleDSLContentTypes()
     // contentFields
+    const contentFieldFilters = this.getSimpleDSLContentFields()
     // includeCurrentPage
     // excludeIds
     // dateFilter
     // sort
-    const sortFilters = this.getSimpleSort()
+    const sortFilters = this.getSimpleDSLSort()
     // itemsToLoad
 
     const body = {
       query: {
         bool: {
-          must: [
-            {
-              "multi_match": {
-                'query': 'demo',
-                'type': 'phrase_prefix',
-                'fields': ['body', 'field_landing_page_summary', 'field_page_intro_text', 'field_paragraph_body', 'field_paragraph_summary', 'summary_processed', 'title']
-              }
-            },
-          ],
+          must: [],
           filter: [],
           must_not: []
         }
@@ -118,9 +111,9 @@ module.exports = class ContentCollection {
       )
     }
 
-    if (contentIdFilters.length > 0) {
+    if (contentIdFilters) {
       body.query.bool.filter.push(
-        { terms: [...contentIdFilters] }
+        { terms: contentIdFilters }
       )
     }
 
@@ -130,6 +123,14 @@ module.exports = class ContentCollection {
       )
     }
 
+    if (contentFieldFilters.length > 0) {
+      contentFieldFilters.forEach(item => {
+        body.query.bool.filter.push(
+          { 'terms': { [item.fieldName]: item.fieldConfig.values } } 
+        )
+      })
+    }
+
     if (sortFilters.length > 0) {
       body.sort = sortFilters
     }
@@ -137,22 +138,33 @@ module.exports = class ContentCollection {
     return body
   }
 
-  getContentIds () {
-    const filters = []
-    if (this.config.internal?.contentIds) {
-      filters.push({ "nid": this.config.internal.contentIds })
+  getSimpleDSLContentIds () {
+    if (this.config.internal?.contentIds && !this.config.internal.contentIds.some(isNaN)) {
+      return { "nid": this.config.internal.contentIds }
     }
-    return filters
+    return null
   }
 
-  getSimpleContentTypes () {
+  getSimpleDSLContentTypes () {
     if (this.config.internal?.contentTypes) {
       return { "type": this.config.internal.contentTypes }
     }
     return null
   }
 
-  getSimpleSort () {
+  getSimpleDSLContentFields () {
+    const filters = []
+    if (this.config.internal?.contentFields) {
+      for (let [fieldName, fieldConfig] of Object.entries(this.config.internal.contentFields)) {
+        filters.push(
+          { 'fieldName': fieldName, 'fieldConfig': fieldConfig }
+        )
+      }
+    }
+    return filters
+  }
+
+  getSimpleDSLSort () {
     const filters = []
     if (this.config.internal?.sort) {
       this.config.internal.sort.forEach(item => {
