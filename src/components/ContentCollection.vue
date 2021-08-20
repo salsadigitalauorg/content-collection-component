@@ -20,7 +20,16 @@
     >
       <template v-slot:count>{{ resultCount }}</template>
       <template v-slot:sort>
-        <rpl-form :formData="exposedControlFormData" />
+        <rpl-content-collection-select
+          v-if="itemsToLoadForm"
+          v-bind="itemsToLoadForm"
+          @change="controlChange"
+        />
+        <rpl-content-collection-select
+          v-if="sortForm"
+          v-bind="sortForm"
+          @change="controlChange"
+        />
       </template>
       <template v-slot:loading>{{ loadingText }}</template>
       <template v-slot:results="scoped">
@@ -52,7 +61,8 @@
 
 <script>
 import { RplLink } from '@dpc-sdp/ripple-link'
-import { RplSelect, RplForm } from '@dpc-sdp/ripple-form'
+import { RplForm } from '@dpc-sdp/ripple-form'
+import RplContentCollectionSelect from './ContentCollectionSelect.vue'
 import { RplCol } from '@dpc-sdp/ripple-grid'
 import { RplSearchResultsLayout, RplSearchResult } from '@dpc-sdp/ripple-search'
 import provideChildCols from '@dpc-sdp/ripple-global/mixins/ProvideChildCols'
@@ -64,7 +74,7 @@ export default {
   components: {
     RplLink,
     RplForm,
-    RplSelect,
+    RplContentCollectionSelect,
     RplCol,
     RplSearchResultsLayout,
     RplSearchResult
@@ -78,11 +88,17 @@ export default {
     },
     debug: {
       type: Boolean,
-      default: true
+      default: false
     }
   },
   data () {
+    const dataManager = new ContentCollection(this.schema)
+    const sortForm = dataManager.getExposedSortForm()
+    const itemsToLoadForm = dataManager.getExposedItemsToLoadForm()
     return {
+      dataManager,
+      sortForm,
+      itemsToLoadForm,
       state: {
         page: 1,
         itemsToLoad: 10
@@ -152,53 +168,10 @@ export default {
           ]
         },
         formState: {}
-      },
-      exposedControlFormData: {
-        model: {
-          itemsPerPage: '1',
-          sort: '10'
-        },
-        schema: {
-          groups: [{
-            styleClasses: ['app-content-collection__form-wrap'],
-            fields: [
-              {
-                type: 'rplselect',
-                model: 'itemsPerPage',
-                validator: ['required'],
-                label: 'Items per page',
-                placeholder: 'Select a value',
-                values: [{ id: '1', name: 'Title ASC'}, { id: '2', name: 'Title DESC'}],
-                styleClasses: ['app-content-collection__form-col-2']
-              },
-              {
-                type: 'rplselect',
-                model: 'sort',
-                validator: ['required'],
-                label: 'Sort',
-                placeholder: 'Select a value',
-                values: [{ id: '10', name: '10'}, { id: '20', name: '20'}],
-                styleClasses: ['app-content-collection__form-col-2']
-              },
-              {
-                type: 'rplsubmitloader',
-                buttonText: 'Go',
-                loading: false,
-                autoUpdate: true,
-                styleClasses: ['app-content-collection__form-inline']
-              }
-            ]
-          }]
-        },
-        formState: {}
       }
     }
   },
   computed: {
-    dataManager () {
-      // TODO: This has changed slightly from the default implementation.
-      return new ContentCollection(this.schema)
-    },
     title () {
       return this.dataManager.getTitle()
     },
@@ -232,6 +205,9 @@ export default {
       const response = await this.dataManager.getResults(this.state)
       console.table(response)
       this.results = response
+    },
+    controlChange (value) {
+      console.log(value)
     }
   },
   mounted () {

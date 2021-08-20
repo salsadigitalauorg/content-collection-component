@@ -65,7 +65,7 @@ module.exports = class ContentCollection {
   // ---------------------------------------------------------------------------
   getDSL () {
     // Uncomment below to temporarily test simple query.
-    return this.getSimpleDSL()
+    // return this.getSimpleDSL()
 
     if (this.config?.internal?.custom) {
       // Return Custom DSL if available.
@@ -172,6 +172,51 @@ module.exports = class ContentCollection {
       })
     }
     return filters
+  }
+
+  // ---------------------------------------------------------------------------
+  // Exposed Form Methods
+  // ---------------------------------------------------------------------------
+  getExposedFilterForm () {
+
+  }
+
+  getExposedSortForm () {
+    const sort = this.config?.interface?.display?.options?.sort
+    if (sort) {
+      const options = sort.values.map(item => {
+        return {
+          label: item.name,
+          value: item.value
+        }
+      })
+      return {
+        label: 'Sort',
+        value: options[0].value,
+        options: options
+      }
+    } else {
+      return null
+    }
+  }
+
+  getExposedItemsToLoadForm () {
+    const itemsToLoad = this.config?.interface?.display?.options?.itemsToLoad
+    if (itemsToLoad) {
+      const options = itemsToLoad.values.map(item => {
+        return {
+          label: item.name,
+          value: item.value
+        }
+      })
+      return {
+        label: 'Items per page',
+        value: options[0].value,
+        options: options
+      }
+    } else {
+      return null
+    }
   }
 
   // ---------------------------------------------------------------------------

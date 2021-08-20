@@ -75,7 +75,26 @@ export default {
               resultsCountText: 'Displaying {range} of {count} results',
               loadingText: 'Loading',
               noResultsText: 'Sorry! We couldn\'t find any matches',
-              errorText: 'Search isn\'t working right now, please try again later.'
+              errorText: 'Search isn\'t working right now, please try again later.',
+              sort: {
+                type: 'field',
+                values: [
+                  { "name": "Relevance", "value": null },
+                  { "name": "Title A-Z", "value": [ { "field": "title", "direction": "asc" } ] },
+                  { "name": "Title Z-A", "value": [ { "field": "title", "direction": "desc" } ] },
+                  { "name": "Newest", "value": [ { "field": "field_date", "direction": "asc" } ] },
+                  { "name": "Oldest", "value": [ { "field": "field_date", "direction": "desc" } ] }
+                ]
+              },
+              itemsToLoad: {
+                type: 'field',
+                values: [
+                  { "name": "10", "value": 10 },
+                  { "name": "20", "value": 20 },
+                  { "name": "50", "value": 50 },
+                  { "name": "All", "value": 9999 }
+                ]
+              }
             },
             resultComponent: {
               type: 'search-result'
