@@ -24,7 +24,14 @@ export default {
           contentTypes: ['landing_page'],
           contentFields: {
             field_topic: { operator: 'AND', values: ['110', '439', '4223', '601'] },
-            field_tags: { operator: 'AND', values: ['108'] }
+            // field_tags: { operator: 'AND', values: ['108'] }
+          },
+          dateFilter: {
+            criteria: 'this_month',
+            startDateField: 'created',
+            endDateField: 'created',
+            dateRangeStart: '2021-08-17T00:00:00+10:00',
+            dateRangeEnd: '2021-08-19T23:59:59+10:00'
           },
           sort: [
             { field: 'created', direction: 'desc' }
