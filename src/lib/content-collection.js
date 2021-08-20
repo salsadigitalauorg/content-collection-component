@@ -62,6 +62,7 @@ module.exports = class ContentCollection {
     // contentTypes
     const contentTypeFilters = this.getSimpleDSLContentTypes()
     // contentFields
+    const contentFieldFilters = this.getSimpleDSLContentFields()
     // includeCurrentPage
     // excludeIds
     // dateFilter
@@ -98,6 +99,14 @@ module.exports = class ContentCollection {
       )
     }
 
+    if (contentFieldFilters.length > 0) {
+      contentFieldFilters.forEach(item => {
+        body.query.bool.filter.push(
+          { 'terms': { [item.fieldName]: item.fieldConfig.values } } 
+        )
+      })
+    }
+
     if (sortFilters.length > 0) {
       body.sort = sortFilters
     }
@@ -117,6 +126,18 @@ module.exports = class ContentCollection {
       return { "type": this.config.internal.contentTypes }
     }
     return null
+  }
+
+  getSimpleDSLContentFields () {
+    const filters = []
+    if (this.config.internal?.contentFields) {
+      for (let [fieldName, fieldConfig] of Object.entries(this.config.internal.contentFields)) {
+        filters.push(
+          { 'fieldName': fieldName, 'fieldConfig': fieldConfig }
+        )
+      }
+    }
+    return filters
   }
 
   getSimpleDSLSort () {
