@@ -142,28 +142,42 @@ export default {
       console.table(response)
       this.results = response
     },
+    syncTo (from, to, allowed) {
+      Object.keys(from).forEach(key => {
+        const canSync = allowed ? (allowed.indexOf(key) >= 0) : true
+        if (canSync) {
+          to[key] = from[key]
+        }
+      })
+    },
     controlChange (form, value) {
-      // TODO - Convert to Query String
-      console.log(form, value)
       this.state[form] = value
       this.updateQuery()
     },
     exposedFilterFormSubmit () {
-      // TODO - Convert to Query String
-      console.log(this.exposedFilterFormData.model)
-      const query = { q: this.exposedFilterFormData.model.q }
+      this.syncTo(this.exposedFilterFormData.model, this.state)
+      this.updateQuery()
+    },
+    updateQuery () {
+      const query = {}
+      this.syncTo(this.state, query)
       this.$router.replace({ query })
+    },
+    syncQueryState (query) {
+      // TODO - We need friendly names for sort
+      this.syncTo(query, this.state)
+      const formFields = ['q', 'filter_a', 'filter_b'] // TODO get from schema.
+      this.syncTo(this.state, this.exposedFilterFormData.model, formFields)
     }
   },
   watch: {
     $route (to, from) {
-      // TODO - Update the state + form
-      this.state.q = to.query.q ? to.query.q : ''
-      this.exposedFilterFormData.model.q = this.state.q
+      this.syncQueryState(to.query)
       this.getResults()
     }
   },
   mounted () {
+    this.syncQueryState(this.$route.query)
     this.getResults()
   }
 }

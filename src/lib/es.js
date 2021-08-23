@@ -17,6 +17,8 @@ const esClient = new elasticsearch.Client(testESOptions)
 
 module.exports = async function elasticSearch (query, size = 10) {
   try {
+    // TODO - Everything here should be configurable in the query object.
+    // If no index is defined, then the SEARCH_INDEX is used.
     const response = await esClient.search({
       from: 0,
       size: size,
