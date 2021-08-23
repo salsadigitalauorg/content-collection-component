@@ -1,5 +1,5 @@
 const elasticSearch = require('./es.js');
-const moment = require('moment');
+const moment = require('dayjs');
 
 /**
  * ContentCollection
@@ -124,9 +124,7 @@ module.exports = class ContentCollection {
       query: {
         bool: {
           must: [],
-          filter: [
-            { 'range': { 'created': { gte: '2021-08-18T00:00:00+10:00' } } }
-          ],
+          filter: [],
           must_not: []
         }
       },
@@ -214,6 +212,7 @@ module.exports = class ContentCollection {
       const df = this.config.internal.dateFilter
       var start = null
       var end = null
+      var dates = null
 
       switch (df.criteria) {
         case 'range':
@@ -222,18 +221,21 @@ module.exports = class ContentCollection {
           break
 
         case 'today':
-          start = this.getStartEndDates('day').start
-          end = this.getStartEndDates('day').end
+          dates = this.getStartEndDates('day')
+          start = dates.start
+          end = dates.end
           break
 
         case 'this_week':
-          start = this.getStartEndDates('week').start
-          end = this.getStartEndDates('week').end
+          dates = this.getStartEndDates('week')
+          start = dates.start
+          end = dates.end
           break
 
         case 'this_month':
-          start = this.getStartEndDates('month').start
-          end = this.getStartEndDates('month').end
+          dates = this.getStartEndDates('month')
+          start = dates.start
+          end = dates.end
           break
 
         default:
@@ -245,9 +247,16 @@ module.exports = class ContentCollection {
         filters.push({ 'range': { [df.startDateField]: { gte: start } } })
         filters.push({ 'range': { [df.endDateField]: { lte: end } } })
       }
-      
-      return filters
     }
+    return filters
+  }
+
+  getItemsToLoad () {
+    if (this.config.internal?.itemsToLoad) {
+      return this.config.internal.itemsToLoad
+    }
+    // TODO - Still needs custom options implemented.
+    return 10
   }
 
   getStartEndDates (type) {
@@ -323,7 +332,7 @@ module.exports = class ContentCollection {
   async getResults (state) {
     const internalDSL = this.getSearchQuery()
     // TODO - Eventually this will connect into the tideSearch implementation.
-    const results = await elasticSearch(internalDSL)
+    const results = await elasticSearch(internalDSL, this.getItemsToLoad())
     // TODO - Add some hardening around this to prevent errors.
     return results.hits.hits.map(this.mapResult.bind(this))
   }

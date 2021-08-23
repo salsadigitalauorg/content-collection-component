@@ -15,11 +15,11 @@ const testESOptions = {
 }
 const esClient = new elasticsearch.Client(testESOptions)
 
-module.exports = async function elasticSearch (query) {
+module.exports = async function elasticSearch (query, size = 10) {
   try {
     const response = await esClient.search({
       from: 0,
-      size: 10,
+      size: size,
       index: SEARCH_INDEX,
       filterPath: ['hits.hits', 'hits.total'],
       body: query,

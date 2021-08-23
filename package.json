@@ -17,8 +17,8 @@
     "@dpc-sdp/ripple-responsive-img": "^1.23.1",
     "@dpc-sdp/ripple-search": "^1.23.1",
     "core-js": "^3.6.5",
+    "dayjs": "^1.10.6",
     "elasticsearch": "^16.7.2",
-    "moment": "^2.29.1",
     "patch-package": "^6.4.7",
     "vue": "^2.6.11"
   },
