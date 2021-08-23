@@ -19,7 +19,7 @@ export default {
         description: "Aliqua commodo mollit enim nulla minim sit ut ullamco ea dolore non consectetur eu laborum.",
         callToAction: { text: 'View all', url: '/search' },
         internal: {
-          itemsToLoad: 10,
+          itemsToLoad: 20,
           // contentIds: ['7', '10', 15211, 14809],
           contentTypes: ['landing_page'],
           contentFields: {
@@ -30,8 +30,8 @@ export default {
             criteria: 'this_month',
             startDateField: 'created',
             endDateField: 'created',
-            dateRangeStart: '2021-08-17T00:00:00+10:00',
-            dateRangeEnd: '2021-08-19T23:59:59+10:00'
+            dateRangeStart: '2021-01-17T00:00:00+10:00',
+            dateRangeEnd: '2021-12-19T23:59:59+10:00'
           },
           sort: [
             { field: 'created', direction: 'desc' }
