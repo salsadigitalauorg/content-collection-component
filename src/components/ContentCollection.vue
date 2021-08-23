@@ -89,16 +89,16 @@ export default {
   },
   data () {
     const dataManager = new ContentCollection(this.schema)
-    const exposedFilterForm = dataManager.getExposedFilterForm()
-    const exposedControlsForm = dataManager.getExposedControlsForm()
     return {
       dataManager,
       state: {
         page: 1
       },
       results: [],
-      exposedFilterFormData: exposedFilterForm,
-      exposedControlsFormData: exposedControlsForm
+      exposedFilterFormData: dataManager.getExposedFilterForm(),
+      exposedControlsFormData: dataManager.getExposedControlsForm(),
+      exposedControlModels: dataManager.getExposedControlsModelNames(),
+      exposedFilterModels: dataManager.getExposedFilterModelNames()
     }
   },
   computed: {
@@ -162,8 +162,12 @@ export default {
     },
     syncQueryState (query) {
       this.syncTo(query, this.state)
-      this.syncTo(this.state, this.exposedFilterFormData.model, ['q', 'filter_a', 'filter_b'])
-      this.syncTo(this.state, this.exposedControlsFormData.model, ['items_per_page', 'sort'])
+      if (this.exposedFilterFormData) {
+        this.syncTo(this.state, this.exposedFilterFormData.model, this.exposedFilterModels)
+      }
+      if (this.exposedControlsFormData) {
+        this.syncTo(this.state, this.exposedControlsFormData.model, this.exposedControlModels)
+      }
     }
   },
   watch: {

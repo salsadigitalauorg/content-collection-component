@@ -16,7 +16,12 @@ module.exports = class ContentCollection {
       ExposedFilterKeywordLabel: 'Search by keyword',
       ExposedFilterKeywordPlaceholder: 'Enter keywords',
       ExposedFilterSubmitLabel: 'Filter results',
-      ExposedFilterClearFormLabel: 'Clear search filters'
+      ExposedFilterClearFormLabel: 'Clear search filters',
+      ExposedControlSortLabel: 'Sort',
+      ExposedControlSortModel: 'sort',
+      ExposedControlItemsPerPageLabel: 'Items per page',
+      ExposedControlItemsPerPageModel: 'items_per_page',
+      ExposedControlPaginationModel: 'page'
     }
   }
 
@@ -43,10 +48,6 @@ module.exports = class ContentCollection {
     return this.config.callToAction
   }
 
-  getSearchQuery () {
-    return this.getDSL()
-  }
-
   getDisplayType () {
     return this.config?.interface?.display?.type
   }
@@ -57,6 +58,10 @@ module.exports = class ContentCollection {
 
   getDisplayLoadingText () {
     return this.config?.interface?.display?.options?.loadingText
+  }
+
+  getInternalItemsToLoad () {
+    return this.config.internal?.itemsToLoad
   }
 
   getDisplayNoResultsText () {
@@ -98,7 +103,7 @@ module.exports = class ContentCollection {
   // ---------------------------------------------------------------------------
   // DSL Methods
   // ---------------------------------------------------------------------------
-  getDSL () {
+  getDSL (state) {
     // Uncomment below to temporarily test simple query.
     // return this.getSimpleDSL()
 
@@ -107,13 +112,13 @@ module.exports = class ContentCollection {
       return this.config.internal.custom
     } else if (this.config?.internal) {
       // Generate and return the simplified DSL.
-      return this.getSimpleDSL()
+      return this.getSimpleDSL(state)
     } else {
       return null
     }
   }
 
-  getSimpleDSL () {
+  getSimpleDSL (state) {
     // Where should we set the site ID?
     const siteId = '4'
     // contentIds
@@ -162,7 +167,7 @@ module.exports = class ContentCollection {
     if (contentFieldFilters.length > 0) {
       contentFieldFilters.forEach(item => {
         body.query.bool.filter.push(
-          { 'terms': { [item.fieldName]: item.fieldConfig.values } } 
+          { 'terms': { [item.fieldName]: item.fieldConfig.values } }
         )
       })
     }
@@ -259,14 +264,6 @@ module.exports = class ContentCollection {
       }
     }
     return filters
-  }
-
-  getItemsToLoad () {
-    if (this.config.internal?.itemsToLoad) {
-      return this.config.internal.itemsToLoad
-    }
-    // TODO - Still needs custom options implemented.
-    return 10
   }
 
   getStartEndDates (type) {
@@ -381,38 +378,51 @@ module.exports = class ContentCollection {
     return null
   }
 
+  getExposedFilterModelNames () {
+    // TODO - This should come from the filters.
+    return ['q', 'filter_a', 'filter_b']
+  }
+
+  getExposedControlsModelNames () {
+    return this.getExposedControlFields().map(control => control.model)
+  }
+
+  getExposedControlFields () {
+    const controls = [
+      this.getExposedSortField(),
+      this.getExposedItemsToLoadField()
+    ]
+    return controls.filter(item => item !== null)
+  }
+
   getExposedControlsForm () {
     const fields = []
     const model = {}
-
-    const sortField = this.getExposedSortField()
-    if (sortField) {
-      model[sortField.model] = sortField.value
-      fields.push(sortField.field)
-    }
-
-    const itemsToLoadField = this.getExposedItemsToLoadField()
-    if (itemsToLoadField) {
-      model[itemsToLoadField.model] = itemsToLoadField.value
-      fields.push(itemsToLoadField.field)
-    }
-
-    // TODO - Health specific
-    fields.push({
-      type: 'rplsubmitloader',
-      buttonText: 'Go',
-      loading: false,
-      autoUpdate: true,
-      styleClasses: ['app-content-collection__form-inline']
+    const controls = this.getExposedControlFields()
+    controls.forEach(control => {
+      model[control.model] = control.value
+      fields.push(control.field)
     })
 
-    const groups = [{
-      styleClasses: ['app-content-collection__form-wrap'],
-      fields: fields
-    }]
-
-    if (groups.length > 0) {
-      return { model, schema: { groups }, formState: {} }
+    if (fields.length > 0) {
+      // TODO - Health Specific
+      fields.push({
+        type: 'rplsubmitloader',
+        buttonText: 'Go',
+        loading: false,
+        autoUpdate: true,
+        styleClasses: ['app-content-collection__form-inline']
+      })
+      return {
+        model,
+        schema: {
+          groups: [{
+            styleClasses: ['app-content-collection__form-wrap'],
+            fields: fields
+          }]
+        },
+        formState: {}
+      }
     }
     return null
   }
@@ -427,12 +437,12 @@ module.exports = class ContentCollection {
         }
       })
       return {
-        model: 'sort',
+        model: this.getDefault('ExposedControlSortModel'),
         value: values[0].id,
         field: {
           type: 'rplselect',
-          model: 'sort',
-          label: 'Sort',
+          model: this.getDefault('ExposedControlSortModel'),
+          label: this.getDefault('ExposedControlSortLabel'),
           placeholder: 'Select a value',
           values: values,
           styleClasses: ['app-content-collection__form-col-2']
@@ -453,12 +463,12 @@ module.exports = class ContentCollection {
         }
       })
       return {
-        model: 'items_per_page',
+        model: this.getDefault('ExposedControlItemsPerPageModel'),
         value: values[0].id,
         field: {
           type: 'rplselect',
-          model: 'items_per_page',
-          label: 'Items per page',
+          model: this.getDefault('ExposedControlItemsPerPageModel'),
+          label: this.getDefault('ExposedControlItemsPerPageLabel'),
           placeholder: 'Select a value',
           values: values,
           styleClasses: ['app-content-collection__form-col-2']
@@ -473,14 +483,42 @@ module.exports = class ContentCollection {
   // Search Query Methods
   // ---------------------------------------------------------------------------
   async getResults (state) {
-    console.log(state)
-    const internalDSL = this.getSearchQuery()
+    const esRequest = {
+      from: this.getStartingItem(state),
+      size: this.getItemsToLoad(state),
+      filterPath: ['hits.hits', 'hits.total'],
+      body: this.getDSL(state),
+      _source: []
+    }
+
     // TODO - Eventually this will connect into the tideSearch implementation.
-    const results = await elasticSearch(internalDSL, this.getItemsToLoad())
+    const results = await elasticSearch(esRequest)
     // TODO - Add some hardening around this to prevent errors.
     return results.hits.hits.map(this.mapResult.bind(this))
   }
 
+  getItemsToLoad (state) {
+    const modelName = this.getDefault('ExposedControlItemsPerPageModel')
+    let loadCount = this.getInternalItemsToLoad() ?? 10
+    if (state[modelName]) {
+      loadCount = state.items_per_page
+    }
+    return loadCount
+  }
+
+  getStartingItem (state) {
+    const modelName = this.getDefault('ExposedControlPaginationModel')
+    let start = 0
+    if (state[modelName]) {
+      const total = this.getItemsToLoad(state)
+      start = (state.page - 1) * total
+    }
+    return start
+  }
+
+  // ---------------------------------------------------------------------------
+  // Result Mapping Method
+  // ---------------------------------------------------------------------------
   mapResult (item) {
     const _source = item._source
 
