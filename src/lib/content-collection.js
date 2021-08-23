@@ -12,11 +12,25 @@ module.exports = class ContentCollection {
   // ---------------------------------------------------------------------------
   constructor (configuration) {
     this.config = configuration
+    this.defaults = {
+      ExposedFilterKeywordLabel: 'Search by keyword',
+      ExposedFilterKeywordPlaceholder: 'Enter keywords',
+      ExposedFilterSubmitLabel: 'Filter results',
+      ExposedFilterClearFormLabel: 'Clear search filters'
+    }
   }
 
   // ---------------------------------------------------------------------------
   // Getters / Setters
   // ---------------------------------------------------------------------------
+  getDefault (key) {
+    return this.defaults[key]
+  }
+
+  cloneObject (obj) {
+    return JSON.parse(JSON.stringify(obj))
+  }
+
   getTitle () {
     return this.config.title
   }
@@ -27,10 +41,6 @@ module.exports = class ContentCollection {
 
   getCTA () {
     return this.config.callToAction
-  }
-
-  getExposedFilterForm () {
-    return {}
   }
 
   getSearchQuery () {
@@ -270,7 +280,105 @@ module.exports = class ContentCollection {
   // Exposed Form Methods
   // ---------------------------------------------------------------------------
   getExposedFilterForm () {
+    const groups = []
+    const model = {}
 
+    const keywordGroup = this.getExposedFilterKeywordGroup()
+    if (keywordGroup) {
+      model['q'] = ''
+      groups.push(keywordGroup)
+    }
+
+    const advancedFilterGroup = this.getExposedFilterAdvancedFilterGroup()
+    if (advancedFilterGroup) {
+      model['filter_a'] = ''
+      model['filter_b'] = ''
+      groups.push(advancedFilterGroup)
+    }
+
+    const submissionGroup = this.getExposedFilterSubmissionGroup()
+    if (submissionGroup) {
+      groups.push(submissionGroup)
+    }
+
+    if (groups.length > 0) {
+      return { model, schema: { groups }, formState: {} }
+    }
+    return null
+  }
+
+  getExposedFilterKeywordGroup () {
+    const keyword = this.config?.interface?.keyword
+    if (keyword) {
+      return {
+        fields: [{
+          type: 'input',
+          inputType: 'text',
+          label: keyword?.label || this.getDefault('ExposedFilterKeywordLabel'),
+          placeholder: keyword?.placeholder || this.getDefault('ExposedFilterKeywordPlaceholder'),
+          model: 'q'
+        }]
+      }
+    }
+    return null
+  }
+
+  getExposedFilterAdvancedFilterGroup () {
+    const filters = this.config?.interface?.filters?.fields
+    if (filters?.length > 0) {
+      const fields = []
+      filters.forEach(schemaField => {
+        const field = this.getExposedFilterField(schemaField)
+        if (field) {
+          fields.push(field)
+        }
+      })
+      return {
+        styleClasses: ['app-content-collection__form-wrap'],
+        fields
+      }
+    }
+    return null
+  }
+
+  getExposedFilterField (schemaField) {
+    switch (schemaField.type) {
+      case 'basic':
+        const field = this.cloneObject(schemaField.options)
+        field.styleClasses = schemaField.additionalClasses
+        return field
+        break
+    }
+    return null
+  }
+
+  getExposedFilterSubmissionGroup () {
+    const fields = []
+    const submit = this.config?.interface?.filters?.submit
+    if (submit?.visibility === 'visible') {
+      fields.push({
+        type: 'rplsubmitloader',
+        buttonText: submit?.label ?? this.getDefault('ExposedFilterSubmitLabel'),
+        loading: false,
+        autoUpdate: true,
+        styleClasses: ['app-content-collection__form-inline']
+      })
+    }
+    const clear = this.config?.interface?.filters?.clearForm
+    if (clear?.visibility === 'visible') {
+      fields.push({
+        type: 'rplclearform',
+        buttonText: clear?.label ?? this.getDefault('ExposedFilterClearFormLabel'),
+        styleClasses: ['app-content-collection__form-inline']
+      })
+    }
+    if (fields.length > 0) {
+      return {
+        styleClasses: ['app-content-collection__form-wrap'],
+        fields: fields
+      }
+    }
+    return null
   }
 
   getExposedSortForm () {
@@ -323,7 +431,7 @@ module.exports = class ContentCollection {
     if (itemsToLoad) {
       fields.push(itemsToLoad)
     }
-    return fields
+    return fields.length > 0 ? fields : null
   }
 
   // ---------------------------------------------------------------------------

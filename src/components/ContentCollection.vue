@@ -11,7 +11,11 @@
     <p v-if="description">{{ description }}</p>
     <rpl-link v-if="cta" :href="cta.url">{{ cta.text }}</rpl-link>
     <!-- Filters -->
-    <rpl-form :formData="exposedFilterFormData" />
+    <rpl-form
+      v-if="exposedFilterFormData"
+      :formData="exposedFilterFormData"
+      :submitHandler="exposedFilterFormSubmit"
+    />
     <!-- Search Results -->
     <rpl-search-results-layout
       :searchResults="results"
@@ -87,84 +91,17 @@ export default {
   },
   data () {
     const dataManager = new ContentCollection(this.schema)
-    const sortForm = dataManager.getExposedSortForm()
-    const itemsToLoadForm = dataManager.getExposedItemsToLoadForm()
+    const exposedFilterForm = dataManager.getExposedFilterForm()
     const controlFields = dataManager.getControlFields()
     return {
       dataManager,
-      sortForm,
-      itemsToLoadForm,
       controlFields,
       state: {
         page: 1,
         itemsToLoad: 10
       },
       results: [],
-      exposedFilterFormData: {
-        model: {
-          keywords: '',
-          filter_a: '',
-          filter_b: ''
-        },
-        schema: {
-          groups: [
-            {
-              fields: [
-                {
-                  type: 'input',
-                  inputType: 'text',
-                  label: 'Keywords',
-                  placeholder: 'Enter some text...',
-                  model: 'keywords'
-                }
-              ]
-            },
-            {
-              styleClasses: ['app-content-collection__form-wrap'],
-              fields: [
-                {
-                  type: 'rplselect',
-                  multiselect: true,
-                  model: 'filter_a',
-                  validator: ['required'],
-                  label: 'Filter A',
-                  placeholder: 'Select a value for the filter',
-                  values: [{ id: 'A', name: 'Option A'}, { id: '2', name: 'Option B'}],
-                  styleClasses: ['app-content-collection__form-col-2']
-                },
-                {
-                  type: 'rplselect',
-                  multiselect: true,
-                  model: 'filter_b',
-                  validator: ['required'],
-                  label: 'Filter B',
-                  placeholder: 'Select a value for the filter',
-                  values: [{ id: 'A', name: 'Option X'}, { id: '2', name: 'Option Y'}],
-                  styleClasses: ['app-content-collection__form-col-2']
-                }
-              ]
-            },
-            {
-              styleClasses: ['app-content-collection__form-wrap'],
-              fields: [
-                {
-                  type: 'rplsubmitloader',
-                  buttonText: 'Filter results',
-                  loading: false,
-                  autoUpdate: true,
-                  styleClasses: ['app-content-collection__form-inline']
-                },
-                {
-                  type: 'rplclearform',
-                  buttonText: 'Clear search filters',
-                  styleClasses: ['app-content-collection__form-inline']
-                }
-              ]
-            }
-          ]
-        },
-        formState: {}
-      }
+      exposedFilterFormData: exposedFilterForm
     }
   },
   computed: {
@@ -206,7 +143,24 @@ export default {
       this.results = response
     },
     controlChange (form, value) {
+      // TODO - Convert to Query String
       console.log(form, value)
+      this.state[form] = value
+      this.updateQuery()
+    },
+    exposedFilterFormSubmit () {
+      // TODO - Convert to Query String
+      console.log(this.exposedFilterFormData.model)
+      const query = { q: this.exposedFilterFormData.model.q }
+      this.$router.replace({ query })
+    }
+  },
+  watch: {
+    $route (to, from) {
+      // TODO - Update the state + form
+      this.state.q = to.query.q ? to.query.q : ''
+      this.exposedFilterFormData.model.q = this.state.q
+      this.getResults()
     }
   },
   mounted () {
