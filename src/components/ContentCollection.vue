@@ -24,11 +24,11 @@
     >
       <template v-slot:count>{{ resultCount }}</template>
       <template v-slot:sort>
-        <rpl-content-collection-select
-          v-for="(fieldData, controlFieldId) in controlFields"
-          :key="`${controlFieldId}-control-form`"
-          v-bind="fieldData"
-          @change="controlChange(fieldData.model, $event)"
+        <rpl-form
+          v-if="exposedControlsFormData"
+          :formData="exposedControlsFormData"
+          :submitHandler="exposedControlsFormSubmit"
+          :listenForClearForm="false"
         />
       </template>
       <template v-slot:loading>{{ loadingText }}</template>
@@ -57,7 +57,6 @@
 <script>
 import { RplLink } from '@dpc-sdp/ripple-link'
 import { RplForm } from '@dpc-sdp/ripple-form'
-import RplContentCollectionSelect from './ContentCollectionSelect.vue'
 import { RplCol } from '@dpc-sdp/ripple-grid'
 import provideChildCols from '@dpc-sdp/ripple-global/mixins/ProvideChildCols'
 import ContentCollection from '../lib/content-collection.js'
@@ -71,7 +70,6 @@ export default {
   components: {
     RplLink,
     RplForm,
-    RplContentCollectionSelect,
     RplCol,
     RplSearchResultsLayout,
     RplSearchResult,
@@ -92,16 +90,15 @@ export default {
   data () {
     const dataManager = new ContentCollection(this.schema)
     const exposedFilterForm = dataManager.getExposedFilterForm()
-    const controlFields = dataManager.getControlFields()
+    const exposedControlsForm = dataManager.getExposedControlsForm()
     return {
       dataManager,
-      controlFields,
       state: {
-        page: 1,
-        itemsToLoad: 10
+        page: 1
       },
       results: [],
-      exposedFilterFormData: exposedFilterForm
+      exposedFilterFormData: exposedFilterForm,
+      exposedControlsFormData: exposedControlsForm
     }
   },
   computed: {
@@ -150,12 +147,12 @@ export default {
         }
       })
     },
-    controlChange (form, value) {
-      this.state[form] = value
-      this.updateQuery()
-    },
     exposedFilterFormSubmit () {
       this.syncTo(this.exposedFilterFormData.model, this.state)
+      this.updateQuery()
+    },
+    exposedControlsFormSubmit () {
+      this.syncTo(this.exposedControlsFormData.model, this.state)
       this.updateQuery()
     },
     updateQuery () {
@@ -164,10 +161,9 @@ export default {
       this.$router.replace({ query })
     },
     syncQueryState (query) {
-      // TODO - We need friendly names for sort
       this.syncTo(query, this.state)
-      const formFields = ['q', 'filter_a', 'filter_b'] // TODO get from schema.
-      this.syncTo(this.state, this.exposedFilterFormData.model, formFields)
+      this.syncTo(this.state, this.exposedFilterFormData.model, ['q', 'filter_a', 'filter_b'])
+      this.syncTo(this.state, this.exposedControlsFormData.model, ['items_per_page', 'sort'])
     }
   },
   watch: {

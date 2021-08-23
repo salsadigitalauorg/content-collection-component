@@ -381,63 +381,99 @@ module.exports = class ContentCollection {
     return null
   }
 
-  getExposedSortForm () {
+  getExposedControlsForm () {
+    const fields = []
+    const model = {}
+
+    const sortField = this.getExposedSortField()
+    if (sortField) {
+      model[sortField.model] = sortField.value
+      fields.push(sortField.field)
+    }
+
+    const itemsToLoadField = this.getExposedItemsToLoadField()
+    if (itemsToLoadField) {
+      model[itemsToLoadField.model] = itemsToLoadField.value
+      fields.push(itemsToLoadField.field)
+    }
+
+    // TODO - Health specific
+    fields.push({
+      type: 'rplsubmitloader',
+      buttonText: 'Go',
+      loading: false,
+      autoUpdate: true,
+      styleClasses: ['app-content-collection__form-inline']
+    })
+
+    const groups = [{
+      styleClasses: ['app-content-collection__form-wrap'],
+      fields: fields
+    }]
+
+    if (groups.length > 0) {
+      return { model, schema: { groups }, formState: {} }
+    }
+    return null
+  }
+
+  getExposedSortField () {
     const sort = this.config?.interface?.display?.options?.sort
     if (sort) {
-      const options = sort.values.map(item => {
+      const values = sort.values.map(item => {
         return {
-          label: item.name,
-          value: item.value
+          id: item.name,
+          name: item.name
         }
       })
       return {
         model: 'sort',
-        label: 'Sort',
-        value: options[0].value,
-        options: options
+        value: values[0].id,
+        field: {
+          type: 'rplselect',
+          model: 'sort',
+          label: 'Sort',
+          placeholder: 'Select a value',
+          values: values,
+          styleClasses: ['app-content-collection__form-col-2']
+        }
       }
     } else {
       return null
     }
   }
 
-  getExposedItemsToLoadForm () {
+  getExposedItemsToLoadField () {
     const itemsToLoad = this.config?.interface?.display?.options?.itemsToLoad
     if (itemsToLoad) {
-      const options = itemsToLoad.values.map(item => {
+      const values = itemsToLoad.values.map(item => {
         return {
-          label: item.name,
-          value: item.value
+          id: item.name.toString(),
+          name: item.name
         }
       })
       return {
         model: 'items_per_page',
-        label: 'Items per page',
-        value: options[0].value,
-        options: options
+        value: values[0].id,
+        field: {
+          type: 'rplselect',
+          model: 'items_per_page',
+          label: 'Items per page',
+          placeholder: 'Select a value',
+          values: values,
+          styleClasses: ['app-content-collection__form-col-2']
+        }
       }
     } else {
       return null
     }
-  }
-
-  getControlFields () {
-    const fields = []
-    const sort = this.getExposedSortForm()
-    if (sort) {
-      fields.push(sort)
-    }
-    const itemsToLoad = this.getExposedItemsToLoadForm()
-    if (itemsToLoad) {
-      fields.push(itemsToLoad)
-    }
-    return fields.length > 0 ? fields : null
   }
 
   // ---------------------------------------------------------------------------
   // Search Query Methods
   // ---------------------------------------------------------------------------
   async getResults (state) {
+    console.log(state)
     const internalDSL = this.getSearchQuery()
     // TODO - Eventually this will connect into the tideSearch implementation.
     const results = await elasticSearch(internalDSL, this.getItemsToLoad())
