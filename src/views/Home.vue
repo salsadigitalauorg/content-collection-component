@@ -133,10 +133,10 @@ export default {
                 type: 'field',
                 values: [
                   { "name": "Relevance", "value": null },
-                  { "name": "Title A-Z", "value": [ { "field": "title", "direction": "asc" } ] },
-                  { "name": "Title Z-A", "value": [ { "field": "title", "direction": "desc" } ] },
-                  { "name": "Newest", "value": [ { "field": "field_date", "direction": "asc" } ] },
-                  { "name": "Oldest", "value": [ { "field": "field_date", "direction": "desc" } ] }
+                  { "name": "Title A-Z", "value": [ { "field": "title.keyword", "direction": "asc" } ] },
+                  { "name": "Title Z-A", "value": [ { "field": "title.keyword", "direction": "desc" } ] },
+                  { "name": "Newest", "value": [ { "field": "created", "direction": "desc" } ] },
+                  { "name": "Oldest", "value": [ { "field": "created", "direction": "asc" } ] }
                 ]
               },
               itemsToLoad: {

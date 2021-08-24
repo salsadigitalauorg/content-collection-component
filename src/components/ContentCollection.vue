@@ -167,10 +167,12 @@ export default {
     },
     exposedFilterFormSubmit () {
       this.syncTo(this.exposedFilterFormData.model, this.state)
+      this.state.page = 1
       this.updateQuery()
     },
     exposedControlsFormSubmit () {
       this.syncTo(this.exposedControlsFormData.model, this.state)
+      this.state.page = 1
       this.updateQuery()
     },
     updateQuery () {
@@ -211,7 +213,7 @@ export default {
 @import "~@dpc-sdp/ripple-global/scss/tools";
 
 .app-content-collection {
-  background-color: pink;
+  background-color: grey;
 
   &__debug {
     background-color: #eee;

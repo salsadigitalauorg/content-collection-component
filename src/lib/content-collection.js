@@ -36,6 +36,10 @@ module.exports = class ContentCollection {
     return JSON.parse(JSON.stringify(obj))
   }
 
+  getStateValue (state, defaultKey) {
+    return state[this.getDefault(defaultKey)]
+  }
+
   getTitle () {
     return this.config.title
   }
@@ -108,9 +112,6 @@ module.exports = class ContentCollection {
   // DSL Methods
   // ---------------------------------------------------------------------------
   getDSL (state) {
-    // Uncomment below to temporarily test simple query.
-    // return this.getSimpleDSL()
-
     if (this.config?.internal?.custom) {
       // Return Custom DSL if available.
       return this.config.internal.custom
@@ -136,7 +137,7 @@ module.exports = class ContentCollection {
     // dateFilter
     const dateRangeFilters = this.getSimpleDSLDateRange()
     // sort
-    const sortFilters = this.getSimpleDSLSort()
+    const sortFilters = this.getSimpleDSLSort(state)
     // itemsToLoad
 
     const body = {
@@ -215,12 +216,17 @@ module.exports = class ContentCollection {
     return filters
   }
 
-  getSimpleDSLSort () {
-    const filters = []
-    if (this.config.internal?.sort) {
-      this.config.internal.sort.forEach(item => {
-        filters.push({ [item.field]: item.direction })
-      })
+  getSimpleDSLSort (state) {
+    let filters = []
+    let sortValue = null
+    const stateSortId = this.getStateValue(state, 'ExposedControlSortModel')
+    if (stateSortId) {
+      sortValue = this.getSortValueFromId(stateSortId)
+    } else {
+      sortValue = this.config.internal?.sort
+    }
+    if (sortValue) {
+      filters = sortValue.map(item => ({ [item.field]: item.direction }))
     }
     return filters
   }
@@ -431,30 +437,48 @@ module.exports = class ContentCollection {
     return null
   }
 
-  getExposedSortField () {
+  getSortValueFromId (option) {
+    const sortValues = this.getExposedSortValues()
+    if (sortValues) {
+      const idx = sortValues.findIndex(val => val.id === option)
+      if (idx >= 0) {
+        return sortValues[idx].value
+      }
+    }
+    return null
+  }
+
+  getExposedSortValues () {
     const sort = this.config?.interface?.display?.options?.sort
     if (sort) {
-      const values = sort.values.map(item => {
+      return sort.values.map(item => {
         return {
-          id: item.name,
-          name: item.name
+          id: item.name, // TODO - Consider using a URI friendly name?
+          name: item.name,
+          value: item.value
         }
       })
+    }
+    return null
+  }
+
+  getExposedSortField () {
+    const sortValues = this.getExposedSortValues()
+    if (sortValues) {
       return {
         model: this.getDefault('ExposedControlSortModel'),
-        value: values[0].id,
+        value: sortValues[0].id,
         field: {
           type: 'rplselect',
           model: this.getDefault('ExposedControlSortModel'),
           label: this.getDefault('ExposedControlSortLabel'),
           placeholder: 'Select a value',
-          values: values,
+          values: sortValues.map(({ id, name }) => ({ id, name })),
           styleClasses: ['app-content-collection__form-col-2']
         }
       }
-    } else {
-      return null
     }
+    return null
   }
 
   getExposedItemsToLoadField () {
