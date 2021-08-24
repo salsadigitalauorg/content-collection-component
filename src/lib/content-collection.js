@@ -100,6 +100,10 @@ module.exports = class ContentCollection {
     }
   }
 
+  getDisplayPaginationComponentColumns () {
+    return { m: 6, l: 4, xxxl: 3 }
+  }
+
   // ---------------------------------------------------------------------------
   // DSL Methods
   // ---------------------------------------------------------------------------
@@ -494,7 +498,22 @@ module.exports = class ContentCollection {
     // TODO - Eventually this will connect into the tideSearch implementation.
     const results = await elasticSearch(esRequest)
     // TODO - Add some hardening around this to prevent errors.
-    return results.hits.hits.map(this.mapResult.bind(this))
+    return {
+      hits: results.hits.hits.map(this.mapResult.bind(this)),
+      total: results.hits.total
+    }
+  }
+
+  getDefaultState () {
+    // TODO - Populate based on exposed filter defaults.
+    return {
+      page: 1,
+      items_per_page: '1',
+      sort: 'Relevance',
+      q: '',
+      filter_a: '',
+      filter_b: ''
+    }
   }
 
   getItemsToLoad (state) {
@@ -514,6 +533,30 @@ module.exports = class ContentCollection {
       start = (state.page - 1) * total
     }
     return start
+  }
+
+  getResultCountRange (state, count) {
+    const initialStep = state.page
+    const itemsPerPage = state.items_per_page
+    if (count && count > 0) {
+      const from = initialStep < 2 ? 1 : (itemsPerPage * (initialStep - 1)) + 1
+      const byPage = itemsPerPage * initialStep
+      const total = (byPage > count) ? count : byPage
+      return `${from}-${total}`
+    }
+    return false
+  }
+
+  getProcessedResultsCount (state, count) {
+    let text = this.getDisplayResultCountText()
+    const range = this.getResultCountRange(state, count)
+    text = text.replace('{range}', range)
+    text = text.replace('{count}', count)
+    return text
+  }
+
+  getPaginationTotalSteps (state, count) {
+    return Math.ceil(Number(count) / this.getItemsToLoad(state))
   }
 
   // ---------------------------------------------------------------------------

@@ -22,7 +22,7 @@
       :errorMsg="errorText"
       :noResultsMsg="noResultsText"
     >
-      <template v-slot:count>{{ resultCount }}</template>
+      <template v-slot:count v-if="resultCount">{{ resultCount }}</template>
       <template v-slot:sort>
         <rpl-form
           v-if="exposedControlsFormData"
@@ -48,7 +48,15 @@
           </rpl-col>
         </slot>
       </template>
-      <template v-slot:pagination>pagination</template>
+      <template v-slot:pagination>
+        <rpl-col cols="full" :colsBp="paginationColumns">
+          <rpl-pagination
+            v-if="paginationData"
+            v-bind="paginationData"
+            @change="paginationChange"
+          />
+        </rpl-col>
+      </template>
     </rpl-search-results-layout>
     <hr/>
   </div>
@@ -60,6 +68,7 @@ import { RplForm } from '@dpc-sdp/ripple-form'
 import { RplCol } from '@dpc-sdp/ripple-grid'
 import provideChildCols from '@dpc-sdp/ripple-global/mixins/ProvideChildCols'
 import ContentCollection from '../lib/content-collection.js'
+import RplPagination from '@dpc-sdp/ripple-pagination'
 import { RplSearchResultsLayout, RplSearchResult } from '@dpc-sdp/ripple-search'
 import { RplCardPromo } from '@dpc-sdp/ripple-card'
 // TODO - We need to figure out how custom result components can be loaded.
@@ -73,7 +82,8 @@ export default {
     RplCol,
     RplSearchResultsLayout,
     RplSearchResult,
-    RplCardPromo
+    RplCardPromo,
+    RplPagination
   },
   props: {
     schema: Object,
@@ -91,14 +101,16 @@ export default {
     const dataManager = new ContentCollection(this.schema)
     return {
       dataManager,
-      state: {
-        page: 1
-      },
+      defaultState: dataManager.getDefaultState(),
+      state: dataManager.getDefaultState(),
       results: [],
+      resultTotal: null,
+      resultCount: null,
       exposedFilterFormData: dataManager.getExposedFilterForm(),
       exposedControlsFormData: dataManager.getExposedControlsForm(),
       exposedControlModels: dataManager.getExposedControlsModelNames(),
-      exposedFilterModels: dataManager.getExposedFilterModelNames()
+      exposedFilterModels: dataManager.getExposedFilterModelNames(),
+      paginationData: { totalSteps: 0, initialStep: 1, stepsAround: 2 }
     }
   },
   computed: {
@@ -114,9 +126,6 @@ export default {
     debugSimpleDSL () {
       return this.dataManager.getSimpleDSL()
     },
-    resultCount () {
-      return this.dataManager.getDisplayResultCountText()
-    },
     loadingText () {
       return this.dataManager.getDisplayLoadingText()
     },
@@ -131,13 +140,18 @@ export default {
     },
     resultColumns () {
       return this.dataManager.getDisplayResultComponentColumns()
+    },
+    paginationColumns () {
+      return this.dataManager.getDisplayPaginationComponentColumns()
     }
   },
   methods: {
     async getResults () {
       const response = await this.dataManager.getResults(this.state)
-      console.table(response)
-      this.results = response
+      console.log(response)
+      this.results = response.hits
+      this.resultCount = this.dataManager.getProcessedResultsCount(this.state, response.total)
+      this.paginationData.totalSteps = this.dataManager.getPaginationTotalSteps(this.state, response.total)
     },
     syncTo (from, to, allowed) {
       Object.keys(from).forEach(key => {
@@ -146,6 +160,10 @@ export default {
           to[key] = from[key]
         }
       })
+    },
+    paginationChange (value) {
+      this.syncTo({ page: value }, this.state)
+      this.updateQuery()
     },
     exposedFilterFormSubmit () {
       this.syncTo(this.exposedFilterFormData.model, this.state)
@@ -157,6 +175,7 @@ export default {
     },
     updateQuery () {
       const query = {}
+      // TODO - Take into account the default state.
       this.syncTo(this.state, query)
       this.$router.replace({ query })
     },
@@ -167,6 +186,10 @@ export default {
       }
       if (this.exposedControlsFormData) {
         this.syncTo(this.state, this.exposedControlsFormData.model, this.exposedControlModels)
+      }
+      // TODO - The pagination implementation could be cleaner.
+      if (this.paginationData) {
+        this.paginationData.initialStep = parseInt(this.state.page)
       }
     }
   },
