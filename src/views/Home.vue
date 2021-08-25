@@ -79,8 +79,7 @@ export default {
           keyword: {
             type: 'basic',
             label: 'Search by keyword',
-            placeholder: 'Enter keyword(s)',
-            fields: [ 'title', 'body', 'summary_processed' ]
+            placeholder: 'Enter keyword(s)'
           },
           filters: {
             submit: {

@@ -22,7 +22,9 @@ module.exports = class ContentCollection {
       ExposedControlItemsPerPageLabel: 'Items per page',
       ExposedControlItemsPerPageModel: 'items_per_page',
       ExposedControlPaginationModel: 'page',
-      ExposedFilterKeywordModel: 'q'
+      ExposedFilterKeywordModel: 'q',
+      ExposedFilterKeywordType: 'phrase_prefix',
+      ExposedFilterKeywordDefaultFields: ['title', 'body', 'summary_processed', 'field_landing_page_summary', 'field_paragraph_summary', 'field_page_intro_text', 'field_paragraph_body']
     }
   }
 
@@ -139,7 +141,8 @@ module.exports = class ContentCollection {
     const dateRangeFilters = this.getSimpleDSLDateRange()
     // sort
     const sortFilters = this.getSimpleDSLSort(state)
-    // itemsToLoad
+    // keyword
+    const exposedKeyword = this.getSimpleDSLExposedKeyword(state)
 
     const body = {
       query: {
@@ -150,6 +153,10 @@ module.exports = class ContentCollection {
         }
       },
       sort: []
+    }
+
+    if (exposedKeyword) {
+      body.query.bool.must.push(exposedKeyword)
     }
 
     if (siteId) {
@@ -189,6 +196,23 @@ module.exports = class ContentCollection {
     }
 
     return body
+  }
+
+  getSimpleDSLExposedKeyword (state) {
+    const keyword = this.config?.interface?.keyword
+    if (keyword.type === 'basic') {
+      const stateValue = this.getStateValue(state, 'ExposedFilterKeywordModel')
+      if (stateValue) {
+        return {
+          multi_match: {
+            query: stateValue,
+            type: this.getDefault('ExposedFilterKeywordType'),
+            fields: keyword.fields ?? this.getDefault('ExposedFilterKeywordDefaultFields')
+          }
+        }
+      }
+    }
+    return null
   }
 
   getSimpleDSLContentIds () {
@@ -565,7 +589,7 @@ module.exports = class ContentCollection {
     // TODO - Populate based on exposed filter defaults.
     return {
       page: 1,
-      items_per_page: '1',
+      items_per_page: '5',
       sort: 'Relevance',
       q: '',
       type: '',
