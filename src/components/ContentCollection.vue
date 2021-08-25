@@ -1,21 +1,22 @@
 <template>
   <div class="app-content-collection">
-    <div v-if="debug" class="app-content-collection__debug">
-      <strong>Schema</strong>
-      <pre>{{ schema }}</pre>
-      <strong>Query</strong>
-      <pre>{{ debugSimpleDSL }}</pre>
+    <!-- Heading -->
+    <div class="app-content-collection__header">
+      <div class="app-content-collection__header-left">
+        <h2 v-if="title" class="app-content-collection__heading">{{ title }}</h2>
+        <p v-if="description">{{ description }}</p>
+      </div>
+      <div class="app-content-collection__header-right">
+        <rpl-link v-if="cta" :href="cta.url">{{ cta.text }}</rpl-link>
+      </div>
     </div>
-    <!-- Listing Content -->
-    <h2 v-if="title">{{ title }}</h2>
-    <p v-if="description">{{ description }}</p>
-    <rpl-link v-if="cta" :href="cta.url">{{ cta.text }}</rpl-link>
     <!-- Filters -->
     <rpl-form
       v-if="exposedFilterFormData"
       :formData="exposedFilterFormData"
       :submitHandler="exposedFilterFormSubmit"
     />
+    <hr v-if="exposedFilterFormData" />
     <!-- Search Results -->
     <rpl-search-results-layout
       :searchResults="results"
@@ -58,7 +59,6 @@
         </rpl-col>
       </template>
     </rpl-search-results-layout>
-    <hr/>
   </div>
 </template>
 
@@ -92,10 +92,6 @@ export default {
     sidebar: {
       type: Boolean,
       default: false
-    },
-    debug: {
-      type: Boolean,
-      default: false
     }
   },
   data () {
@@ -124,9 +120,6 @@ export default {
     cta () {
       return this.dataManager.getCTA()
     },
-    debugSimpleDSL () {
-      return this.dataManager.getSimpleDSL()
-    },
     loadingText () {
       return this.dataManager.getDisplayLoadingText()
     },
@@ -151,13 +144,14 @@ export default {
       const response = await this.dataManager.getResults(this.state)
       console.log(response)
       // Aggregations
+      // TODO - Some of this needs to be in ContentCollection, some here.
       Object.keys(response.aggregations).forEach(model => {
         this.exposedFilterFormData.schema.groups.forEach(group => {
           group.fields.forEach(field => {
             if (field.model === model) {
               const buckets = response.aggregations[model].buckets
               if (buckets.length > 0) {
-                field.values = buckets.map(({ key }) => ({ id: key, name: key }))
+                field.values = buckets.map(({ key, doc_count }) => ({ id: key, name: `${key} (${doc_count})` }))
                 Vue.set(field, 'disabled', false)
               } else {
                 this.state[model] = this.defaultState[model]
@@ -235,12 +229,18 @@ export default {
 @import "~@dpc-sdp/ripple-global/scss/tools";
 
 .app-content-collection {
-  background-color: grey;
+  &__header {
+    @include rpl-breakpoint('m') {
+      display: flex;
+      justify-content: space-between;
+      width: 100%;
+    }
+  }
 
-  &__debug {
-    background-color: #eee;
-    font-size: 90%;
-    padding: 5rem;
+  &__heading {
+    @include rpl_typography('heading_l')
+    margin: 0;
+    margin-bottom: $rpl-space * 5;
   }
 
   &__search-result {
@@ -250,13 +250,38 @@ export default {
 
   &__form-wrap {
     display: flex;
+    flex-wrap: wrap;
     align-items: flex-end;
+  }
+
+  &__form-col-full {
+    width: 100%;
   }
 
   &__form-col-2 {
     width: 100%;
-    @include rpl-breakpoint('l') {
+    @include rpl-breakpoint('m') {
       width: 50%;
+    }
+  }
+
+  &__form-col-3 {
+    width: 100%;
+    @include rpl-breakpoint('m') {
+      width: 50%;
+    }
+    @include rpl-breakpoint('l') {
+      width: 33.33%;
+    }
+  }
+
+  &__form-col-4 {
+    width: 100%;
+    @include rpl-breakpoint('m') {
+      width: 50%;
+    }
+    @include rpl-breakpoint('l') {
+      width: 25%;
     }
   }
 
