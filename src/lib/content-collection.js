@@ -143,6 +143,8 @@ module.exports = class ContentCollection {
     const sortFilters = this.getSimpleDSLSort(state)
     // keyword
     const exposedKeyword = this.getSimpleDSLExposedKeyword(state)
+    // advanced filters
+    const advancedFilters = this.getSimpleDSLExposedAdvancedFilters(state)
 
     const body = {
       query: {
@@ -159,6 +161,13 @@ module.exports = class ContentCollection {
       body.query.bool.must.push(exposedKeyword)
     }
 
+    if (advancedFilters) {
+      body.query.bool.filter.push(...advancedFilters.filters)
+      if (advancedFilters.aggs) {
+        body.aggs = advancedFilters.aggs
+      }
+    }
+
     if (siteId) {
       body.query.bool.filter.push(
         { terms: { 'field_node_site': [siteId] } }
@@ -173,7 +182,7 @@ module.exports = class ContentCollection {
 
     if (contentTypeFilters) {
       body.query.bool.filter.push(
-         { terms: contentTypeFilters }
+        { terms: contentTypeFilters }
       )
     }
 
@@ -211,6 +220,36 @@ module.exports = class ContentCollection {
           }
         }
       }
+    }
+    return null
+  }
+
+  getSimpleDSLExposedAdvancedFilters (state) {
+    const filterFields = this.config?.interface?.filters?.fields
+    if (filterFields) {
+      const filters = []
+      let aggs = null
+      filterFields.forEach(group => {
+        const model = group.options.model
+        const value = state[model]
+        if (Array.isArray(value)) {
+          if (value.length > 0) {
+            filters.push({ 'terms': { [model]: value } })
+          }
+        } else if (value) {
+          filters.push({ 'terms': { [model]: [value] } })
+        }
+        // Check for aggs
+        if (group['elasticsearch-aggregation']) {
+          if (!aggs) {
+            aggs = {}
+          }
+          aggs[model] = {
+            terms: { field: model, order: { _key: 'asc' }, size: 30 }
+          }
+        }
+      })
+      return { filters, aggs }
     }
     return null
   }
@@ -571,7 +610,7 @@ module.exports = class ContentCollection {
     const esRequest = {
       from: this.getStartingItem(state),
       size: this.getItemsToLoad(state),
-      filterPath: ['hits.hits', 'hits.total'],
+      filterPath: ['hits.hits', 'hits.total', 'aggregations'],
       body: this.getDSL(state),
       _source: []
     }
@@ -581,7 +620,8 @@ module.exports = class ContentCollection {
     // TODO - Add some hardening around this to prevent errors.
     return {
       hits: results.hits.hits.map(this.mapResult.bind(this)),
-      total: results.hits.total
+      total: results.hits.total,
+      aggregations: results.aggregations
     }
   }
 

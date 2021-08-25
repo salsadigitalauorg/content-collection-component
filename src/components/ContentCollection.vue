@@ -63,6 +63,7 @@
 </template>
 
 <script>
+import Vue from 'vue'
 import { RplLink } from '@dpc-sdp/ripple-link'
 import { RplForm } from '@dpc-sdp/ripple-form'
 import { RplCol } from '@dpc-sdp/ripple-grid'
@@ -149,6 +150,24 @@ export default {
     async getResults () {
       const response = await this.dataManager.getResults(this.state)
       console.log(response)
+      // Aggregations
+      Object.keys(response.aggregations).forEach(model => {
+        this.exposedFilterFormData.schema.groups.forEach(group => {
+          group.fields.forEach(field => {
+            if (field.model === model) {
+              const buckets = response.aggregations[model].buckets
+              if (buckets.length > 0) {
+                field.values = buckets.map(({ key }) => ({ id: key, name: key }))
+                Vue.set(field, 'disabled', false)
+              } else {
+                this.state[model] = this.defaultState[model]
+                field.values = this.state[model]
+                Vue.set(field, 'disabled', true)
+              }
+            }
+          })
+        })
+      })
       this.results = response.hits
       this.resultCount = this.dataManager.getProcessedResultsCount(this.state, response.total)
       this.paginationData.totalSteps = this.dataManager.getPaginationTotalSteps(this.state, response.total)

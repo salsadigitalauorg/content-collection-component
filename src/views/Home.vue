@@ -21,7 +21,7 @@ export default {
         internal: {
           itemsToLoad: 20,
           // contentIds: ['7', '10', 15211, 14809],
-          contentTypes: ['landing_page'],
+          // contentTypes: ['landing_page'],
           contentFields: {
             // field_topic: { operator: 'AND', values: ['110', '439', '4223', '601'] },
             // field_tags: { operator: 'AND', values: ['108'] }
@@ -106,25 +106,35 @@ export default {
                   ]
                 },
                 additionalClasses: [ 'app-content-collection__form-col-2' ],
-                'elasticsearch-field': 'field_year',
+                'elasticsearch-field': 'type',
+                'elasticsearch-aggregation': false
+              },
+              {
+                type: 'basic',
+                options: {
+                  model: 'field_tags_name',
+                  type: 'rplselect',
+                  multiselect: true,
+                  label: 'Tags',
+                  placeholder: 'Select some tags',
+                  values: []
+                },
+                additionalClasses: [ 'app-content-collection__form-col-2' ],
+                'elasticsearch-field': 'field_tags_name',
                 'elasticsearch-aggregation': true
               },
               {
                 type: 'basic',
                 options: {
-                  model: 'filter_b',
+                  model: 'field_topic_name',
                   type: 'rplselect',
                   multiselect: true,
-                  label: 'Filter B',
-                  placeholder: 'Select some B filters',
-                  values: [
-                    { id: 'topic_a', name: 'Topic A' },
-                    { id: 'topic_b', name: 'Topic B' },
-                    { id: 'topic_c', name: 'Topic C' }
-                  ]
+                  label: 'Topic',
+                  placeholder: 'Select a topic',
+                  values: []
                 },
                 additionalClasses: [ 'app-content-collection__form-col-2' ],
-                'elasticsearch-field': 'field_year',
+                'elasticsearch-field': 'field_topic',
                 'elasticsearch-aggregation': true
               }
             ]
