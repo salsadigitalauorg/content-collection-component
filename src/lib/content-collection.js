@@ -21,7 +21,8 @@ module.exports = class ContentCollection {
       ExposedControlSortModel: 'sort',
       ExposedControlItemsPerPageLabel: 'Items per page',
       ExposedControlItemsPerPageModel: 'items_per_page',
-      ExposedControlPaginationModel: 'page'
+      ExposedControlPaginationModel: 'page',
+      ExposedFilterKeywordModel: 'q'
     }
   }
 
@@ -289,24 +290,16 @@ module.exports = class ContentCollection {
   getExposedFilterForm () {
     const groups = []
     const model = {}
+    const filterGroups = this.getExposedFilterGroups()
 
-    const keywordGroup = this.getExposedFilterKeywordGroup()
-    if (keywordGroup) {
-      model['q'] = ''
-      groups.push(keywordGroup)
-    }
-
-    const advancedFilterGroup = this.getExposedFilterAdvancedFilterGroup()
-    if (advancedFilterGroup) {
-      model['filter_a'] = ''
-      model['filter_b'] = ''
-      groups.push(advancedFilterGroup)
-    }
-
-    const submissionGroup = this.getExposedFilterSubmissionGroup()
-    if (submissionGroup) {
-      groups.push(submissionGroup)
-    }
+    filterGroups.forEach(group => {
+      if (group.models) {
+        group.models.forEach((item, idx) => {
+          model[item] = group.values[idx]
+        })
+      }
+      groups.push(group.group)
+    })
 
     if (groups.length > 0) {
       return { model, schema: { groups }, formState: {} }
@@ -314,17 +307,31 @@ module.exports = class ContentCollection {
     return null
   }
 
+  getExposedFilterGroups() {
+    const groups = [
+      this.getExposedFilterKeywordGroup(),
+      this.getExposedFilterAdvancedFilterGroup(),
+      this.getExposedFilterSubmissionGroup()
+    ]
+    return groups.filter(item => item !== null)
+  }
+
   getExposedFilterKeywordGroup () {
     const keyword = this.config?.interface?.keyword
     if (keyword) {
+      const model = this.getDefault('ExposedFilterKeywordModel')
       return {
-        fields: [{
-          type: 'input',
-          inputType: 'text',
-          label: keyword?.label || this.getDefault('ExposedFilterKeywordLabel'),
-          placeholder: keyword?.placeholder || this.getDefault('ExposedFilterKeywordPlaceholder'),
-          model: 'q'
-        }]
+        models: [model],
+        values: [''],
+        group: {
+          fields: [{
+            type: 'input',
+            inputType: 'text',
+            label: keyword?.label || this.getDefault('ExposedFilterKeywordLabel'),
+            placeholder: keyword?.placeholder || this.getDefault('ExposedFilterKeywordPlaceholder'),
+            model: model
+          }]
+        }
       }
     }
     return null
@@ -333,19 +340,38 @@ module.exports = class ContentCollection {
   getExposedFilterAdvancedFilterGroup () {
     const filters = this.config?.interface?.filters?.fields
     if (filters?.length > 0) {
+      const models = []
+      const values = []
       const fields = []
       filters.forEach(schemaField => {
         const field = this.getExposedFilterField(schemaField)
+        models.push(field.model)
+        values.push(this.getExposedFilterFieldDefaultValue(schemaField))
         if (field) {
           fields.push(field)
         }
       })
       return {
-        styleClasses: ['app-content-collection__form-wrap'],
-        fields
+        models: models,
+        values: values,
+        group: {
+          styleClasses: ['app-content-collection__form-wrap'],
+          fields
+        }
       }
     }
     return null
+  }
+
+  getExposedFilterFieldDefaultValue (schemaField) {
+    if (schemaField.type === 'basic') {
+      if (schemaField.options.type === 'rplselect') {
+        if (schemaField.options.multiselect) {
+          return []
+        }
+      }
+    }
+    return ''
   }
 
   getExposedFilterField (schemaField) {
@@ -381,16 +407,23 @@ module.exports = class ContentCollection {
     }
     if (fields.length > 0) {
       return {
-        styleClasses: ['app-content-collection__form-wrap'],
-        fields: fields
+        group: {
+          styleClasses: ['app-content-collection__form-wrap'],
+          fields: fields
+        }
       }
     }
     return null
   }
 
   getExposedFilterModelNames () {
-    // TODO - This should come from the filters.
-    return ['q', 'filter_a', 'filter_b']
+    let modelNames = []
+    this.getExposedFilterGroups().forEach(group => {
+      if (group.models) {
+        modelNames.push(...group.models)
+      }
+    })
+    return modelNames
   }
 
   getExposedControlsModelNames () {
@@ -535,8 +568,8 @@ module.exports = class ContentCollection {
       items_per_page: '1',
       sort: 'Relevance',
       q: '',
-      filter_a: '',
-      filter_b: ''
+      type: '',
+      filter_b: []
     }
   }
 

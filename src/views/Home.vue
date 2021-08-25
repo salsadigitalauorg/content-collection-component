@@ -95,12 +95,16 @@ export default {
               {
                 type: 'basic',
                 options: {
-                  model: 'filter_a',
+                  model: 'type',
                   type: 'rplselect',
-                  label: 'Field label',
-                  hint: 'Field hint text',
-                  placeholder: 'Field placeholder',
-                  values: [ { id: 'topic_a', name: 'Topic A' } ]
+                  label: 'Type',
+                  hint: 'The content type to filter by',
+                  placeholder: 'Select type',
+                  values: [
+                    { id: 'landing_page', name: 'Landing Page' },
+                    { id: 'record_page', name: 'Record Page' },
+                    { id: 'conviction_record', name: 'Conviction Record' },
+                  ]
                 },
                 additionalClasses: [ 'app-content-collection__form-col-2' ],
                 'elasticsearch-field': 'field_year',
@@ -114,7 +118,11 @@ export default {
                   multiselect: true,
                   label: 'Filter B',
                   placeholder: 'Select some B filters',
-                  values: [ { id: 'topic_a', name: 'Topic A' } ]
+                  values: [
+                    { id: 'topic_a', name: 'Topic A' },
+                    { id: 'topic_b', name: 'Topic B' },
+                    { id: 'topic_c', name: 'Topic C' }
+                  ]
                 },
                 additionalClasses: [ 'app-content-collection__form-col-2' ],
                 'elasticsearch-field': 'field_year',

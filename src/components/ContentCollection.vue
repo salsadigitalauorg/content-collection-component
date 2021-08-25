@@ -153,11 +153,14 @@ export default {
       this.resultCount = this.dataManager.getProcessedResultsCount(this.state, response.total)
       this.paginationData.totalSteps = this.dataManager.getPaginationTotalSteps(this.state, response.total)
     },
+    getNewValue (value) {
+      return Array.isArray(value) ? [...value] : value
+    },
     syncTo (from, to, allowed) {
       Object.keys(from).forEach(key => {
         const canSync = allowed ? (allowed.indexOf(key) >= 0) : true
         if (canSync) {
-          to[key] = from[key]
+          to[key] = this.getNewValue(from[key])
         }
       })
     },
