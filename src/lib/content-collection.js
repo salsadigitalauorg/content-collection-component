@@ -91,6 +91,19 @@ module.exports = class ContentCollection {
     return JSON.parse(JSON.stringify(obj))
   }
 
+  getNewValue (value) {
+    return Array.isArray(value) ? [...value] : value
+  }
+
+  syncObject (from, to, allowed) {
+    Object.keys(from).forEach(key => {
+      const canSync = allowed ? (allowed.indexOf(key) >= 0) : true
+      if (canSync) {
+        to[key] = this.getNewValue(from[key])
+      }
+    })
+  }
+
   getDefault (key) {
     return this.defaults[key]
   }

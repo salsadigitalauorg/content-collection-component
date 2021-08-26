@@ -89,8 +89,8 @@ export default {
   },
   props: {
     schema: Object,
-    initialState: Object,
     environment: Object,
+    initialResponse: Object,
     sidebar: {
       type: Boolean,
       default: false
@@ -156,44 +156,41 @@ export default {
     async getResults () {
       this.resultsLoading = true
       const response = await this.dataManager.getResults(this.state)
+      this.updatePropertiesBasedOnSearchResponse(response)
+      this.resultsLoading = false
+    },
+    updatePropertiesBasedOnSearchResponse (response) {
       if (this.exposedFilterFormData && response.aggregations) {
-        // Aggregations
-        // TODO - Some of this needs to be in ContentCollection, some here.
-        Object.keys(response.aggregations).forEach(model => {
-          this.exposedFilterFormData.schema.groups.forEach(group => {
-            group.fields.forEach(field => {
-              if (field.model === model) {
-                const buckets = response.aggregations[model].buckets
-                if (buckets.length > 0) {
-                  field.values = buckets.map(({ key, doc_count: count }) => ({ id: key, name: `${key} (${count})` }))
-                  Vue.set(field, 'disabled', false)
-                } else {
-                  this.state[model] = this.defaultState[model]
-                  field.values = this.state[model]
-                  Vue.set(field, 'disabled', true)
-                }
-              }
-            })
-          })
-        })
+        this.updateExposedFilterFormAggregations(response.aggregations)
       }
       this.results = response.hits
       this.resultCount = this.dataManager.getProcessedResultsCount(this.state, response.total)
       if (this.paginationData) {
         this.paginationData.totalSteps = this.dataManager.getPaginationTotalSteps(this.state, response.total)
       }
-      this.resultsLoading = false
     },
-    getNewValue (value) {
-      return Array.isArray(value) ? [...value] : value
+    updateExposedFilterFormAggregations (responseAggregations) {
+      // TODO - Some of this needs to be in the CC class, some here.
+      Object.keys(responseAggregations).forEach(model => {
+        this.exposedFilterFormData.schema.groups.forEach(group => {
+          group.fields.forEach(field => {
+            if (field.model === model) {
+              const buckets = responseAggregations[model].buckets
+              if (buckets.length > 0) {
+                field.values = buckets.map(({ key, doc_count: count }) => ({ id: key, name: `${key} (${count})` }))
+                Vue.set(field, 'disabled', false)
+              } else {
+                this.state[model] = this.defaultState[model]
+                field.values = this.state[model]
+                Vue.set(field, 'disabled', true)
+              }
+            }
+          })
+        })
+      })
     },
     syncTo (from, to, allowed) {
-      Object.keys(from).forEach(key => {
-        const canSync = allowed ? (allowed.indexOf(key) >= 0) : true
-        if (canSync) {
-          to[key] = this.getNewValue(from[key])
-        }
-      })
+      return this.dataManager.syncObject(from, to, allowed)
     },
     resetPagination () {
       this.state[this.paginationModelName] = 1
@@ -240,9 +237,18 @@ export default {
       this.getResults()
     }
   },
-  mounted () {
+  created () {
     this.syncQueryState(this.$route.query)
-    this.getResults()
+    // Render initialResponse on the server.
+    if (this.initialResponse) {
+      this.updatePropertiesBasedOnSearchResponse(this.initialResponse)
+    }
+  },
+  mounted () {
+    // No server response provided - get results on client.
+    if (!this.initialResponse) {
+      this.getResults()
+    }
   }
 }
 </script>
