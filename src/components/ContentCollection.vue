@@ -22,6 +22,7 @@
       :searchResults="results"
       :errorMsg="errorText"
       :noResultsMsg="noResultsText"
+      :loading="resultsLoading"
     >
       <template v-slot:count v-if="resultCount">{{ resultCount }}</template>
       <template v-slot:sort>
@@ -52,7 +53,7 @@
       <template v-slot:pagination>
         <rpl-col cols="full" :colsBp="paginationColumns">
           <rpl-pagination
-            v-if="paginationData"
+            v-if="showPagination"
             v-bind="paginationData"
             @change="paginationChange"
           />
@@ -95,7 +96,13 @@ export default {
     }
   },
   data () {
-    const dataManager = new ContentCollection(this.schema)
+    const searchEndpoint = this.searchEndpoint.bind(this)
+    const environment = {
+      siteId: '4',
+      primarySiteId: '4',
+      domains: { '4': '' }
+    }
+    const dataManager = new ContentCollection(this.schema, searchEndpoint, environment)
     return {
       dataManager,
       defaultState: dataManager.getDefaultState(),
@@ -103,11 +110,12 @@ export default {
       results: [],
       resultTotal: null,
       resultCount: null,
+      resultsLoading: false,
       exposedFilterFormData: dataManager.getExposedFilterForm(),
       exposedControlsFormData: dataManager.getExposedControlsForm(),
       exposedControlModels: dataManager.getExposedControlsModelNames(),
       exposedFilterModels: dataManager.getExposedFilterModelNames(),
-      paginationData: { totalSteps: 0, initialStep: 1, stepsAround: 2 }
+      paginationData: dataManager.getDisplayPagination()
     }
   },
   computed: {
@@ -137,34 +145,45 @@ export default {
     },
     paginationColumns () {
       return this.dataManager.getDisplayPaginationComponentColumns()
+    },
+    showPagination () {
+      return this.paginationData && this.paginationData.totalSteps > 1
     }
   },
   methods: {
+    searchEndpoint (dsl) {
+      return this.$tideSearchApi.searchByPost(dsl)
+    },
     async getResults () {
+      this.resultsLoading = true
       const response = await this.dataManager.getResults(this.state)
-      console.log(response)
-      // Aggregations
-      // TODO - Some of this needs to be in ContentCollection, some here.
-      Object.keys(response.aggregations).forEach(model => {
-        this.exposedFilterFormData.schema.groups.forEach(group => {
-          group.fields.forEach(field => {
-            if (field.model === model) {
-              const buckets = response.aggregations[model].buckets
-              if (buckets.length > 0) {
-                field.values = buckets.map(({ key, doc_count }) => ({ id: key, name: `${key} (${doc_count})` }))
-                Vue.set(field, 'disabled', false)
-              } else {
-                this.state[model] = this.defaultState[model]
-                field.values = this.state[model]
-                Vue.set(field, 'disabled', true)
+      if (this.exposedFilterFormData && response.aggregations) {
+        // Aggregations
+        // TODO - Some of this needs to be in ContentCollection, some here.
+        Object.keys(response.aggregations).forEach(model => {
+          this.exposedFilterFormData.schema.groups.forEach(group => {
+            group.fields.forEach(field => {
+              if (field.model === model) {
+                const buckets = response.aggregations[model].buckets
+                if (buckets.length > 0) {
+                  field.values = buckets.map(({ key, doc_count: count }) => ({ id: key, name: `${key} (${count})` }))
+                  Vue.set(field, 'disabled', false)
+                } else {
+                  this.state[model] = this.defaultState[model]
+                  field.values = this.state[model]
+                  Vue.set(field, 'disabled', true)
+                }
               }
-            }
+            })
           })
         })
-      })
+      }
       this.results = response.hits
       this.resultCount = this.dataManager.getProcessedResultsCount(this.state, response.total)
-      this.paginationData.totalSteps = this.dataManager.getPaginationTotalSteps(this.state, response.total)
+      if (this.paginationData) {
+        this.paginationData.totalSteps = this.dataManager.getPaginationTotalSteps(this.state, response.total)
+      }
+      this.resultsLoading = false
     },
     getNewValue (value) {
       return Array.isArray(value) ? [...value] : value
