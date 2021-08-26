@@ -259,6 +259,9 @@ $app-content-collection-form-gutter: .75rem;
         p:first-child {
           margin-top: 0;
         }
+        p:last-child {
+          margin-bottom: $rpl-component-gutter-l;
+        }
       }
       &-right {
         .rpl-link {
