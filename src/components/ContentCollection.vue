@@ -234,11 +234,29 @@ export default {
       display: flex;
       justify-content: space-between;
       width: 100%;
+      &-left {
+        p:first-child {
+          margin-top: 0;
+        }
+      }
+      &-right {
+        .rpl-link {
+          white-space: nowrap;
+          display: inline
+        }
+      }
+    }
+    &-right {
+      .rpl-link {
+        white-space: nowrap;
+        margin-bottom: $rpl-space * 5;
+        display: inline-block;
+      }
     }
   }
 
   &__heading {
-    @include rpl_typography('heading_l')
+    @include rpl_typography('heading_l');
     margin: 0;
     margin-bottom: $rpl-space * 5;
   }
@@ -252,36 +270,47 @@ export default {
     display: flex;
     flex-wrap: wrap;
     align-items: flex-end;
+    margin-left: -$rpl-space-3;
+    margin-right: -$rpl-space-3;
+    width: calc(100% + $rpl-space-3 * 2);
   }
 
-  &__form-col-full {
+  &__form-col-full, &__submit {
+    margin-left: .75rem;
+    margin-right: .75rem;
     width: 100%;
   }
 
   &__form-col-2 {
+    margin-left: .75rem;
+    margin-right: .75rem;
     width: 100%;
     @include rpl-breakpoint('m') {
-      width: 50%;
+      width: calc(50% - 1.5rem);
     }
   }
 
   &__form-col-3 {
+    margin-left: .75rem;
+    margin-right: .75rem;
     width: 100%;
     @include rpl-breakpoint('m') {
-      width: 50%;
+      width: calc(50% - 1.5rem);
     }
     @include rpl-breakpoint('l') {
-      width: 33.33%;
+      width: calc(33.33% - 1.5rem);
     }
   }
 
   &__form-col-4 {
+    margin-left: .75rem;
+    margin-right: .75rem;
     width: 100%;
     @include rpl-breakpoint('m') {
-      width: 50%;
+      width: calc(50% - 1.5rem);
     }
     @include rpl-breakpoint('l') {
-      width: 25%;
+      width: calc(25% - 1.5rem);
     }
   }
 
@@ -289,11 +318,48 @@ export default {
     display: inline-block;
   }
 
-  .rpl-search-results-layout__sort {
-    width: 100%;
+  &__form-inline + &__form-inline {
+    margin-left: $rpl-space * 6;
   }
+
+  .rpl-search-results-layout__sort {
+    margin-left: .75rem;
+    margin-right: .75rem;
+    width: 100%;
+
+    .rpl-form {
+      .form-group {
+        width: 100%;
+        @include rpl-breakpoint('m') {
+          display: flex;
+          flex-direction: row;
+          align-items: center;
+          width: auto;
+          label:not(.rpl-option-button__label) {
+            margin-bottom: 0;
+            margin-right: $rpl-space-3;
+          }
+          .rpl-select__trigger {
+            padding-right: $rpl-space-4 * 3;
+          }
+        }
+      }
+    }
+    .app-content-collection__form-inline + .app-content-collection__form-inline {
+      margin-left: 0;
+      @include rpl-breakpoint('m') {
+        margin-left: $rpl-space * 6;
+      }
+    }
+  }
+
   .rpl-search-results-layout__header {
     display: block;
+  }
+
+  .rpl-clearform {
+    padding-top: $rpl-space-3;
+    padding-bottom: $rpl-space-3;
   }
 }
 </style>

@@ -16,7 +16,7 @@ export default {
     return {
       schema: {
         title: "Content Collection",
-        description: "Aliqua commodo mollit enim nulla minim sit ut ullamco ea dolore non consectetur eu laborum.",
+        description: "Aliqua commodo mollit enim nulla minim sit ut ullamco ea dolore non consectetur eu laborum. Aliqua commodo mollit enim nulla minim sit ut ullamco ea dolore non consectetur eu laborum. Aliqua commodo mollit enim nulla minim sit ut ullamco ea dolore non consectetur eu laborum. ",
         callToAction: { text: 'View all', url: '/search' },
         internal: {
           itemsToLoad: 20,

@@ -570,7 +570,7 @@ module.exports = class ContentCollection {
           label: this.getDefault('ExposedControlSortLabel'),
           placeholder: 'Select a value',
           values: sortValues.map(({ id, name }) => ({ id, name })),
-          styleClasses: ['app-content-collection__form-col-3']
+          styleClasses: ['app-content-collection__form-inline']
         }
       }
     }
@@ -595,7 +595,7 @@ module.exports = class ContentCollection {
           label: this.getDefault('ExposedControlItemsPerPageLabel'),
           placeholder: 'Select a value',
           values: values,
-          styleClasses: ['app-content-collection__form-col-3']
+          styleClasses: ['app-content-collection__form-inline']
         }
       }
     } else {
