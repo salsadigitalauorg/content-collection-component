@@ -426,6 +426,7 @@ module.exports = class ContentCollection {
   // Exposed Form Methods
   // ---------------------------------------------------------------------------
   getExposedFilterForm () {
+    let returnFilterFormData = null
     const groups = []
     const model = {}
     const filterGroups = this.getExposedFilterGroups()
@@ -440,9 +441,9 @@ module.exports = class ContentCollection {
     })
 
     if (groups.length > 0) {
-      return { model, schema: { groups }, formState: {} }
+      returnFilterFormData = { model, schema: { groups }, formState: {} }
     }
-    return null
+    return returnFilterFormData
   }
 
   getExposedFilterGroups () {
@@ -455,10 +456,11 @@ module.exports = class ContentCollection {
   }
 
   getExposedFilterKeywordGroup () {
+    let returnKeywordGroup = null
     const keyword = this.config?.interface?.keyword
     if (keyword) {
       const model = this.getDefault('ExposedFilterKeywordModel')
-      return {
+      returnKeywordGroup = {
         models: [model],
         values: [''],
         group: {
@@ -472,10 +474,11 @@ module.exports = class ContentCollection {
         }
       }
     }
-    return null
+    return returnKeywordGroup
   }
 
   getExposedFilterAdvancedFilterGroup () {
+    let returnFilterGroup = null
     const filters = this.config?.interface?.filters?.fields
     if (filters?.length > 0) {
       const models = []
@@ -489,7 +492,7 @@ module.exports = class ContentCollection {
           fields.push(field)
         }
       })
-      return {
+      returnFilterGroup = {
         models: models,
         values: values,
         group: {
@@ -498,32 +501,35 @@ module.exports = class ContentCollection {
         }
       }
     }
-    return null
+    return returnFilterGroup
   }
 
   getExposedFilterFieldDefaultValue (schemaField) {
+    let returnfieldDefaultValue = ''
     if (schemaField.type === 'basic') {
       if (schemaField.options.type === 'rplselect') {
         if (schemaField.options.multiselect) {
-          return []
+          returnfieldDefaultValue = []
         }
       }
     }
-    return ''
+    return returnfieldDefaultValue
   }
 
   getExposedFilterField (schemaField) {
+    let returnFilterField = null
     switch (schemaField.type) {
       case 'basic':
         const field = this.cloneObject(schemaField.options)
         field.styleClasses = schemaField.additionalClasses
-        return field
+        returnFilterField = field
         break
     }
-    return null
+    return returnFilterField
   }
 
   getExposedFilterSubmissionGroup () {
+    let returnSubmissionGroup = null
     const fields = []
     const submit = this.config?.interface?.filters?.submit
     if (submit?.visibility === 'visible') {
@@ -544,14 +550,14 @@ module.exports = class ContentCollection {
       })
     }
     if (fields.length > 0) {
-      return {
+      returnSubmissionGroup = {
         group: {
           styleClasses: ['app-content-collection__form-wrap'],
           fields: fields
         }
       }
     }
-    return null
+    return returnSubmissionGroup
   }
 
   getExposedFilterModelNames () {
@@ -577,6 +583,7 @@ module.exports = class ContentCollection {
   }
 
   getExposedControlsForm () {
+    let returnControlForm = null
     const fields = []
     const model = {}
     const controls = this.getExposedControlFields()
@@ -594,7 +601,7 @@ module.exports = class ContentCollection {
         autoUpdate: true,
         styleClasses: ['app-content-collection__form-inline']
       })
-      return {
+      returnControlForm = {
         model,
         schema: {
           groups: [{
@@ -605,24 +612,26 @@ module.exports = class ContentCollection {
         formState: {}
       }
     }
-    return null
+    return returnControlForm
   }
 
   getSortValueFromId (option) {
+    let returnSortValue = null
     const sortValues = this.getExposedSortValues()
     if (sortValues) {
       const idx = sortValues.findIndex(val => val.id === option)
       if (idx >= 0) {
-        return sortValues[idx].value
+        returnSortValue = sortValues[idx].value
       }
     }
-    return null
+    return returnSortValue
   }
 
   getExposedSortValues () {
+    let returnSortValues = null
     const sort = this.config?.interface?.display?.options?.sort
     if (sort) {
-      return sort.values.map(item => {
+      returnSortValues = sort.values.map(item => {
         return {
           id: item.name, // TODO - Consider using a URI friendly name?
           name: item.name,
@@ -630,13 +639,14 @@ module.exports = class ContentCollection {
         }
       })
     }
-    return null
+    return returnSortValues
   }
 
   getExposedSortField () {
+    let returnSortFields = null
     const sortValues = this.getExposedSortValues()
     if (sortValues) {
-      return {
+      returnSortFields = {
         model: this.getDefault('ExposedControlSortModel'),
         value: sortValues[0].id,
         field: {
@@ -649,10 +659,11 @@ module.exports = class ContentCollection {
         }
       }
     }
-    return null
+    return returnSortFields
   }
 
   getExposedItemsToLoadField () {
+    let returnField = null
     const itemsToLoad = this.config?.interface?.display?.options?.itemsToLoad
     if (itemsToLoad) {
       const values = itemsToLoad.values.map(item => {
@@ -661,7 +672,7 @@ module.exports = class ContentCollection {
           name: item.name
         }
       })
-      return {
+      returnField = {
         model: this.getDefault('ExposedControlItemsPerPageModel'),
         value: values[0].id,
         field: {
@@ -673,9 +684,8 @@ module.exports = class ContentCollection {
           styleClasses: ['app-content-collection__form-col-3']
         }
       }
-    } else {
-      return null
     }
+    return returnField
   }
 
   // ---------------------------------------------------------------------------
@@ -729,15 +739,16 @@ module.exports = class ContentCollection {
   }
 
   getResultCountRange (state, count) {
-    const initialStep = state.page
-    const itemsPerPage = state.items_per_page
+    let returnCountRange = false
     if (count && count > 0) {
+      const initialStep = state.page
+      const itemsPerPage = state.items_per_page
       const from = initialStep < 2 ? 1 : (itemsPerPage * (initialStep - 1)) + 1
       const byPage = itemsPerPage * initialStep
       const total = (byPage > count) ? count : byPage
-      return `${from}-${total}`
+      returnCountRange = `${from}-${total}`
     }
-    return false
+    return returnCountRange
   }
 
   getProcessedResultsCount (state, count) {
@@ -749,7 +760,7 @@ module.exports = class ContentCollection {
   }
 
   getPaginationTotalSteps (state, count) {
-    return Math.ceil(Number(count) / this.getItemsToLoad(state))
+    return Math.ceil(parseInt(count) / this.getItemsToLoad(state))
   }
 
   // ---------------------------------------------------------------------------
