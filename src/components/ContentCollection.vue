@@ -247,6 +247,8 @@ export default {
 @import "~@dpc-sdp/ripple-global/scss/settings";
 @import "~@dpc-sdp/ripple-global/scss/tools";
 
+$app-content-collection-form-gutter: .75rem;
+
 .app-content-collection {
   &__header {
     @include rpl-breakpoint('m') {
@@ -268,8 +270,11 @@ export default {
     &-right {
       .rpl-link {
         white-space: nowrap;
-        margin-bottom: $rpl-space * 5;
+        margin-bottom: $rpl-component-gutter-l;
         display: inline-block;
+        @include rpl-breakpoint('m') {
+          margin-left: $rpl-component-gutter-l;
+        }
       }
     }
   }
@@ -289,47 +294,44 @@ export default {
     display: flex;
     flex-wrap: wrap;
     align-items: flex-end;
-    margin-left: -$rpl-space-3;
-    margin-right: -$rpl-space-3;
-    width: calc(100% + $rpl-space-3 * 2);
+    margin-left: -$app-content-collection-form-gutter;
+    margin-right: -$app-content-collection-form-gutter;
+    width: calc(100% + #{$app-content-collection-form-gutter} * 2);
+
+    &-no-gutter {
+      margin-left: 0;
+      margin-right: 0;
+      width: 100%;
+    }
   }
 
-  &__form-col-full, &__submit {
-    margin-left: .75rem;
-    margin-right: .75rem;
+  &__form-col-full, &__form-col-2, &__form-col-3, &__form-col-4 {
+    margin-left: $app-content-collection-form-gutter;
+    margin-right: $app-content-collection-form-gutter;
     width: 100%;
   }
 
   &__form-col-2 {
-    margin-left: .75rem;
-    margin-right: .75rem;
-    width: 100%;
     @include rpl-breakpoint('m') {
-      width: calc(50% - 1.5rem);
+      width: calc(50% - #{$app-content-collection-form-gutter} * 2);
     }
   }
 
   &__form-col-3 {
-    margin-left: .75rem;
-    margin-right: .75rem;
-    width: 100%;
     @include rpl-breakpoint('m') {
-      width: calc(50% - 1.5rem);
+      width: calc(50% - #{$app-content-collection-form-gutter} * 2);
     }
     @include rpl-breakpoint('l') {
-      width: calc(33.33% - 1.5rem);
+      width: calc(33.33% - #{$app-content-collection-form-gutter} * 2);
     }
   }
 
   &__form-col-4 {
-    margin-left: .75rem;
-    margin-right: .75rem;
-    width: 100%;
     @include rpl-breakpoint('m') {
-      width: calc(50% - 1.5rem);
+      width: calc(50% - #{$app-content-collection-form-gutter} * 2);
     }
     @include rpl-breakpoint('l') {
-      width: calc(25% - 1.5rem);
+      width: calc(25% - #{$app-content-collection-form-gutter} * 2);
     }
   }
 
@@ -338,16 +340,14 @@ export default {
   }
 
   &__form-inline + &__form-inline {
-    margin-left: $rpl-space * 6;
+    margin-left: $rpl-component-gutter-l
   }
 
   .rpl-search-results-layout__sort {
-    margin-left: .75rem;
-    margin-right: .75rem;
-    width: 100%;
-
     .rpl-form {
       .form-group {
+        margin-left: $app-content-collection-form-gutter;
+        margin-right: $app-content-collection-form-gutter;
         width: 100%;
         @include rpl-breakpoint('m') {
           display: flex;
@@ -359,15 +359,14 @@ export default {
             margin-right: $rpl-space-3;
           }
           .rpl-select__trigger {
-            padding-right: $rpl-space-4 * 3;
+            padding-right: $rpl-component-gutter-l * 2;
           }
         }
       }
     }
     .app-content-collection__form-inline + .app-content-collection__form-inline {
-      margin-left: 0;
       @include rpl-breakpoint('m') {
-        margin-left: $rpl-space * 6;
+        margin-left: $rpl-component-gutter-l;
       }
     }
   }
@@ -379,6 +378,11 @@ export default {
   .rpl-clearform {
     padding-top: $rpl-space-3;
     padding-bottom: $rpl-space-3;
+  }
+
+  .vue-form-generator fieldset:not(.app-content-collection__form-wrap) {
+    margin-left: 0;
+    margin-right: 0;
   }
 }
 </style>

@@ -552,7 +552,7 @@ module.exports = class ContentCollection {
     if (fields.length > 0) {
       returnSubmissionGroup = {
         group: {
-          styleClasses: ['app-content-collection__form-wrap'],
+          styleClasses: ['app-content-collection__form-wrap', 'app-content-collection__form-wrap-no-gutter'],
           fields: fields
         }
       }

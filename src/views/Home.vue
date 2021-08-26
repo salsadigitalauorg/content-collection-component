@@ -105,7 +105,7 @@ export default {
                     { id: 'conviction_record', name: 'Conviction Record' },
                   ]
                 },
-                additionalClasses: [ 'app-content-collection__form-col-2' ],
+                additionalClasses: [ 'app-content-collection__form-col-3' ],
                 'elasticsearch-field': 'type',
                 'elasticsearch-aggregation': false
               },
@@ -119,7 +119,7 @@ export default {
                   placeholder: 'Select some tags',
                   values: []
                 },
-                additionalClasses: [ 'app-content-collection__form-col-2' ],
+                additionalClasses: [ 'app-content-collection__form-col-3' ],
                 'elasticsearch-field': 'field_tags_name',
                 'elasticsearch-aggregation': true
               },
@@ -133,7 +133,7 @@ export default {
                   placeholder: 'Select a topic',
                   values: []
                 },
-                additionalClasses: [ 'app-content-collection__form-col-2' ],
+                additionalClasses: [ 'app-content-collection__form-col-3' ],
                 'elasticsearch-field': 'field_topic',
                 'elasticsearch-aggregation': true
               }
