@@ -354,6 +354,7 @@ $app-content-collection-form-gutter: .75rem;
           flex-direction: row;
           align-items: center;
           width: auto;
+          margin-right: 0;
           label:not(.rpl-option-button__label) {
             margin-bottom: 0;
             margin-right: $rpl-space-3;
@@ -367,6 +368,7 @@ $app-content-collection-form-gutter: .75rem;
     .app-content-collection__form-inline + .app-content-collection__form-inline {
       @include rpl-breakpoint('m') {
         margin-left: $rpl-component-gutter-l;
+        margin-right: 0;
       }
     }
   }
@@ -381,6 +383,7 @@ $app-content-collection-form-gutter: .75rem;
   }
 
   .vue-form-generator fieldset:not(.app-content-collection__form-wrap) {
+    // Remove default fieldset margins.
     margin-left: 0;
     margin-right: 0;
   }
