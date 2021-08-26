@@ -17,9 +17,15 @@ const esClient = new elasticsearch.Client(testESOptions)
 
 module.exports = async function elasticSearch (esRequest) {
   try {
-    const req = esRequest
-    if (req.index === undefined) {
-      req.index = SEARCH_INDEX
+    const req = {}
+    req.index = (esRequest.index === undefined) ? SEARCH_INDEX : esRequest.index
+    req.from = esRequest.from
+    req.size = esRequest.size
+    req._source = esRequest._source
+    req.body = {
+      query: esRequest.query,
+      sort: esRequest.sort,
+      aggs: esRequest.aggs
     }
     const response = await esClient.search(req)
     return response

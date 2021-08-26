@@ -167,6 +167,9 @@ export default {
                   { "name": "50", "value": 50 },
                   { "name": "All", "value": 9999 }
                 ]
+              },
+              pagination: {
+                type: 'numbers'
               }
             },
             resultComponent: {

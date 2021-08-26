@@ -1,5 +1,4 @@
-const elasticSearch = require('./es.js');
-const moment = require('dayjs');
+const moment = require('dayjs')
 
 /**
  * ContentCollection
@@ -10,39 +9,99 @@ module.exports = class ContentCollection {
   // ---------------------------------------------------------------------------
   // Constructor
   // ---------------------------------------------------------------------------
-  constructor (configuration) {
+  constructor (configuration, searchEndpoint, environment) {
     this.config = configuration
+    this.searchClient = searchEndpoint
+    this.envConfig = environment
     this.defaults = {
+      EnvironmentSiteId: '4',
       ExposedFilterKeywordLabel: 'Search by keyword',
       ExposedFilterKeywordPlaceholder: 'Enter keywords',
       ExposedFilterSubmitLabel: 'Filter results',
       ExposedFilterClearFormLabel: 'Clear search filters',
-      ExposedControlSortLabel: 'Sort',
       ExposedControlSortModel: 'sort',
-      ExposedControlItemsPerPageLabel: 'Items per page',
+      ExposedControlSortLabel: 'Sort',
+      ExposedControlSortPlaceholder: 'Select a value',
       ExposedControlItemsPerPageModel: 'items_per_page',
+      ExposedControlItemsPerPageLabel: 'Items per page',
+      ExposedControlItemsPerPagePlaceholder: 'Select a value',
       ExposedControlPaginationModel: 'page',
       ExposedFilterKeywordModel: 'q',
       ExposedFilterKeywordType: 'phrase_prefix',
-      ExposedFilterKeywordDefaultFields: ['title', 'body', 'summary_processed', 'field_landing_page_summary', 'field_paragraph_summary', 'field_page_intro_text', 'field_paragraph_body']
+      ExposedFilterKeywordDefaultFields: ['title', 'body', 'summary_processed', 'field_landing_page_summary', 'field_paragraph_summary', 'field_page_intro_text', 'field_paragraph_body'],
+      DisplayResultComponentColumns: { m: 6, l: 4, xxxl: 3 },
+      DisplayPaginationComponentColumns: { m: 6, l: 4, xxxl: 3 },
+      ItemsToLoad: 10
+    }
+    if (!this.searchClient) {
+      throw Error('Content Collection Error: A search client function is required.')
+    }
+    if (!this.envConfig) {
+      console.warn('Content Collection Error: Environmental variables are required. Falling back to default.')
+      const siteId = this.getDefault('EnvironmentSiteId')
+      this.envConfig = {
+        siteId: siteId,
+        primarySiteId: siteId,
+        domains: { [siteId]: '' }
+      }
     }
   }
 
   // ---------------------------------------------------------------------------
-  // Getters / Setters
+  // Utilities
   // ---------------------------------------------------------------------------
-  getDefault (key) {
-    return this.defaults[key]
+  getLocalDomainURL (urls, site, primarySite, domains) {
+    let domain = ''
+    let path = ''
+    if (urls && urls.length > 0) {
+      let siteIds = {}
+      for (let url of urls) {
+        let siteId = url.substring(
+          url.indexOf('-') + 1,
+          url.indexOf('/', 2)
+        )
+        let path = url.substring(url.indexOf('/', 2))
+        siteIds[siteId] = path
+      }
+      if (site in siteIds) {
+        domain = domains[site]
+        path = siteIds[site]
+      } else {
+        domain = domains[primarySite]
+        path = '//' + domain + siteIds[primarySite]
+      }
+    }
+    return { domain, path }
+  }
+
+  getLocalisedLink (urls) {
+    let returnPath = null
+    if (urls?.length > 0) {
+      const cfg = this.envConfig
+      if (cfg.siteId && cfg.primarySiteId && cfg.domains) {
+        returnPath = this.getLocalDomainURL(urls, cfg.siteId, cfg.primarySiteId, cfg.domains).path
+      } else {
+        returnPath = urls[0]
+      }
+    }
+    return returnPath
   }
 
   cloneObject (obj) {
     return JSON.parse(JSON.stringify(obj))
   }
 
+  getDefault (key) {
+    return this.defaults[key]
+  }
+
   getStateValue (state, defaultKey) {
     return state[this.getDefault(defaultKey)]
   }
 
+  // ---------------------------------------------------------------------------
+  // Getters / Setters
+  // ---------------------------------------------------------------------------
   getTitle () {
     return this.config.title
   }
@@ -84,51 +143,63 @@ module.exports = class ContentCollection {
   }
 
   getDisplayResultComponentName () {
+    let returnName = null
     switch (this.getDisplayResultComponentType()) {
       case 'search-result':
-        return 'rpl-search-result'
+        returnName = 'rpl-search-result'
         break
       case 'basic-card':
       default:
-        return 'rpl-card-promo'
+        returnName = 'rpl-card-promo'
         break
     }
+    return returnName
   }
 
   getDisplayResultComponentColumns () {
+    let returnColumn = null
     switch (this.getDisplayResultComponentType()) {
-      case 'search-result':
-        return null
-        break
       case 'basic-card':
-      default:
-        return { m: 6, l: 4, xxxl: 3 }
+        returnColumn = this.getDefault('DisplayResultComponentColumns')
         break
     }
+    return returnColumn
   }
 
   getDisplayPaginationComponentColumns () {
-    return { m: 6, l: 4, xxxl: 3 }
+    return this.getDefault('DisplayPaginationComponentColumns')
+  }
+
+  getDisplayPagination () {
+    let returnPagination = null
+    const pagination = this.config?.interface?.display?.options?.pagination
+    if (pagination) {
+      switch (pagination.type) {
+        case 'numbers':
+          returnPagination = { totalSteps: 0, initialStep: 1, stepsAround: 2 }
+          break
+      }
+    }
+    return returnPagination
   }
 
   // ---------------------------------------------------------------------------
   // DSL Methods
   // ---------------------------------------------------------------------------
   getDSL (state) {
+    let returnDSL = null
     if (this.config?.internal?.custom) {
       // Return Custom DSL if available.
-      return this.config.internal.custom
+      returnDSL = this.config.internal.custom
     } else if (this.config?.internal) {
       // Generate and return the simplified DSL.
-      return this.getSimpleDSL(state)
-    } else {
-      return null
+      returnDSL = this.getSimpleDSL(state)
     }
+    return returnDSL
   }
 
   getSimpleDSL (state) {
-    // Where should we set the site ID?
-    const siteId = '4'
+    const siteId = this.envConfig.siteId
     // contentIds
     const contentIdFilters = this.getSimpleDSLContentIds()
     // contentTypes
@@ -208,23 +279,25 @@ module.exports = class ContentCollection {
   }
 
   getSimpleDSLExposedKeyword (state) {
+    let returnStatement = null
     const keyword = this.config?.interface?.keyword
-    if (keyword.type === 'basic') {
+    if (keyword?.type === 'basic') {
       const stateValue = this.getStateValue(state, 'ExposedFilterKeywordModel')
       if (stateValue) {
-        return {
+        returnStatement = {
           multi_match: {
             query: stateValue,
             type: this.getDefault('ExposedFilterKeywordType'),
-            fields: keyword.fields ?? this.getDefault('ExposedFilterKeywordDefaultFields')
+            fields: keyword.fields || this.getDefault('ExposedFilterKeywordDefaultFields')
           }
         }
       }
     }
-    return null
+    return returnStatement
   }
 
   getSimpleDSLExposedAdvancedFilters (state) {
+    let returnStatement = null
     const filterFields = this.config?.interface?.filters?.fields
     if (filterFields) {
       const filters = []
@@ -249,23 +322,25 @@ module.exports = class ContentCollection {
           }
         }
       })
-      return { filters, aggs }
+      returnStatement = { filters, aggs }
     }
-    return null
+    return returnStatement
   }
 
   getSimpleDSLContentIds () {
+    let returnStatement = null
     if (this.config.internal?.contentIds && !this.config.internal.contentIds.some(isNaN)) {
-      return { "nid": this.config.internal.contentIds }
+      returnStatement = { 'nid': this.config.internal.contentIds }
     }
-    return null
+    return returnStatement
   }
 
   getSimpleDSLContentTypes () {
+    let returnStatement = null
     if (this.config.internal?.contentTypes) {
-      return { "type": this.config.internal.contentTypes }
+      returnStatement = { 'type': this.config.internal.contentTypes }
     }
-    return null
+    return returnStatement
   }
 
   getSimpleDSLContentFields () {
@@ -370,7 +445,7 @@ module.exports = class ContentCollection {
     return null
   }
 
-  getExposedFilterGroups() {
+  getExposedFilterGroups () {
     const groups = [
       this.getExposedFilterKeywordGroup(),
       this.getExposedFilterAdvancedFilterGroup(),
@@ -454,7 +529,7 @@ module.exports = class ContentCollection {
     if (submit?.visibility === 'visible') {
       fields.push({
         type: 'rplsubmitloader',
-        buttonText: submit?.label ?? this.getDefault('ExposedFilterSubmitLabel'),
+        buttonText: submit?.label || this.getDefault('ExposedFilterSubmitLabel'),
         loading: false,
         autoUpdate: true,
         styleClasses: ['app-content-collection__form-inline']
@@ -464,7 +539,7 @@ module.exports = class ContentCollection {
     if (clear?.visibility === 'visible') {
       fields.push({
         type: 'rplclearform',
-        buttonText: clear?.label ?? this.getDefault('ExposedFilterClearFormLabel'),
+        buttonText: clear?.label || this.getDefault('ExposedFilterClearFormLabel'),
         styleClasses: ['app-content-collection__form-inline']
       })
     }
@@ -568,7 +643,7 @@ module.exports = class ContentCollection {
           type: 'rplselect',
           model: this.getDefault('ExposedControlSortModel'),
           label: this.getDefault('ExposedControlSortLabel'),
-          placeholder: 'Select a value',
+          placeholder: this.getDefault('ExposedControlSortPlaceholder'),
           values: sortValues.map(({ id, name }) => ({ id, name })),
           styleClasses: ['app-content-collection__form-col-3']
         }
@@ -593,7 +668,7 @@ module.exports = class ContentCollection {
           type: 'rplselect',
           model: this.getDefault('ExposedControlItemsPerPageModel'),
           label: this.getDefault('ExposedControlItemsPerPageLabel'),
-          placeholder: 'Select a value',
+          placeholder: this.getDefault('ExposedControlItemsPerPagePlaceholder'),
           values: values,
           styleClasses: ['app-content-collection__form-col-3']
         }
@@ -610,13 +685,10 @@ module.exports = class ContentCollection {
     const esRequest = {
       from: this.getStartingItem(state),
       size: this.getItemsToLoad(state),
-      filterPath: ['hits.hits', 'hits.total', 'aggregations'],
-      body: this.getDSL(state),
-      _source: []
+      _source: [],
+      ...this.getDSL(state)
     }
-
-    // TODO - Eventually this will connect into the tideSearch implementation.
-    const results = await elasticSearch(esRequest)
+    const results = await this.searchClient(esRequest)
     // TODO - Add some hardening around this to prevent errors.
     return {
       hits: results.hits.hits.map(this.mapResult.bind(this)),
@@ -639,7 +711,7 @@ module.exports = class ContentCollection {
 
   getItemsToLoad (state) {
     const modelName = this.getDefault('ExposedControlItemsPerPageModel')
-    let loadCount = this.getInternalItemsToLoad() ?? 10
+    let loadCount = this.getInternalItemsToLoad() || this.getDefault('ItemsToLoad')
     if (state[modelName]) {
       loadCount = state.items_per_page
     }
@@ -684,26 +756,29 @@ module.exports = class ContentCollection {
   // Result Mapping Method
   // ---------------------------------------------------------------------------
   mapResult (item) {
+    let mappedResult = null
     const _source = item._source
+    const link = this.getLocalisedLink(_source.url)
 
     switch (this.getDisplayResultComponentType()) {
       case 'search-result':
-        return {
+        mappedResult = {
           title: _source.title?.[0],
-          link: { linkText: _source.url?.[0], linkUrl: _source.url?.[0] },
+          link: { linkText: link, linkUrl: link },
           date: _source.created?.[0],
           description: _source.field_landing_page_summary?.[0]
         }
         break
       case 'card':
       default:
-        return {
+        mappedResult = {
           title: _source.title?.[0],
-          link: { text: _source.url?.[0], url: _source.url?.[0] },
+          link: { text: link, url: link },
           dateStart: _source.created?.[0],
           summary: _source.field_landing_page_summary?.[0]
         }
         break
     }
+    return mappedResult
   }
 }
