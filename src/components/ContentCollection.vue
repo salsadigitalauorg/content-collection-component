@@ -27,8 +27,8 @@
       <template v-slot:count v-if="resultCount">{{ resultCount }}</template>
       <template v-slot:sort>
         <rpl-form
-          v-if="exposedControlsFormData"
-          :formData="exposedControlsFormData"
+          v-if="exposedControlFormData"
+          :formData="exposedControlFormData"
           :submitHandler="exposedControlsFormSubmit"
           :listenForClearForm="false"
         />
@@ -90,7 +90,7 @@ export default {
   props: {
     schema: Object,
     environment: Object,
-    initialResponse: Object,
+    preloadSearchResponse: Object,
     sidebar: {
       type: Boolean,
       default: false
@@ -108,10 +108,10 @@ export default {
       resultCount: null,
       resultsLoading: false,
       exposedFilterFormData: dataManager.getExposedFilterForm(),
-      exposedControlsFormData: dataManager.getExposedControlsForm(),
-      exposedControlModels: dataManager.getExposedControlsModelNames(),
+      exposedControlFormData: dataManager.getExposedControlForm(),
+      exposedControlModels: dataManager.getExposedControlModelNames(),
       exposedFilterModels: dataManager.getExposedFilterModelNames(),
-      paginationData: dataManager.getDisplayPagination()
+      paginationData: dataManager.getDisplayPaginationData()
     }
   },
   computed: {
@@ -210,7 +210,7 @@ export default {
       this.updateQuery()
     },
     exposedControlsFormSubmit () {
-      this.syncTo(this.exposedControlsFormData.model, this.state)
+      this.syncTo(this.exposedControlFormData.model, this.state)
       this.resetPagination()
       this.updateQuery()
     },
@@ -225,8 +225,8 @@ export default {
       if (this.exposedFilterFormData) {
         this.syncTo(this.state, this.exposedFilterFormData.model, this.exposedFilterModels)
       }
-      if (this.exposedControlsFormData) {
-        this.syncTo(this.state, this.exposedControlsFormData.model, this.exposedControlModels)
+      if (this.exposedControlFormData) {
+        this.syncTo(this.state, this.exposedControlFormData.model, this.exposedControlModels)
       }
       this.setPaginationFromState()
     }
@@ -239,14 +239,12 @@ export default {
   },
   created () {
     this.syncQueryState(this.$route.query)
-    // Render initialResponse on the server.
-    if (this.initialResponse) {
-      this.updatePropertiesBasedOnSearchResponse(this.initialResponse)
+    if (this.preloadSearchResponse) {
+      this.updatePropertiesBasedOnSearchResponse(this.preloadSearchResponse)
     }
   },
   mounted () {
-    // No server response provided - get results on client.
-    if (!this.initialResponse) {
+    if (!this.preloadSearchResponse) {
       this.getResults()
     }
   }

@@ -113,7 +113,7 @@ module.exports = class ContentCollection {
   }
 
   // ---------------------------------------------------------------------------
-  // Getters / Setters
+  // Schema Get Methods
   // ---------------------------------------------------------------------------
   getTitle () {
     return this.config.title
@@ -131,16 +131,20 @@ module.exports = class ContentCollection {
     return this.config?.interface?.display?.type
   }
 
+  getInternalSort () {
+    return this.config?.internal?.sort
+  }
+
+  getInternalItemsToLoad () {
+    return this.config?.internal?.itemsToLoad
+  }
+
   getDisplayResultCountText () {
     return this.config?.interface?.display?.options?.resultsCountText
   }
 
   getDisplayLoadingText () {
     return this.config?.interface?.display?.options?.loadingText
-  }
-
-  getInternalItemsToLoad () {
-    return this.config.internal?.itemsToLoad
   }
 
   getDisplayNoResultsText () {
@@ -151,10 +155,25 @@ module.exports = class ContentCollection {
     return this.config?.interface?.display?.options?.errorText
   }
 
+  getDisplaySort () {
+    return this.config?.interface?.display?.options?.sort
+  }
+
+  getDisplayItemsToLoad () {
+    return this.config?.interface?.display?.options?.itemsToLoad
+  }
+
   getDisplayResultComponentType () {
     return this.config?.interface?.display?.resultComponent?.type
   }
 
+  getDisplayPagination () {
+    return this.config?.interface?.display?.options?.pagination
+  }
+
+  // ---------------------------------------------------------------------------
+  // Additional Getter Methods
+  // ---------------------------------------------------------------------------
   getDisplayResultComponentName () {
     let returnName = null
     switch (this.getDisplayResultComponentType()) {
@@ -179,13 +198,25 @@ module.exports = class ContentCollection {
     return returnColumn
   }
 
+  getSortModelName () {
+    return this.getDefault('ExposedControlSortModel')
+  }
+
+  getItemsPerPageModelName () {
+    return this.getDefault('ExposedControlItemsPerPageModel')
+  }
+
+  getPaginationModelName () {
+    return this.getDefault('ExposedControlPaginationModel')
+  }
+
   getDisplayPaginationComponentColumns () {
     return this.getDefault('DisplayPaginationComponentColumns')
   }
 
-  getDisplayPagination () {
+  getDisplayPaginationData () {
     let returnPagination = null
-    const pagination = this.config?.interface?.display?.options?.pagination
+    const pagination = this.getDisplayPagination()
     if (pagination) {
       switch (pagination.type) {
         case 'numbers':
@@ -375,7 +406,7 @@ module.exports = class ContentCollection {
     if (stateSortId) {
       sortValue = this.getSortValueFromId(stateSortId)
     } else {
-      sortValue = this.config.internal?.sort
+      sortValue = this.getInternalSort()
     }
     if (sortValue) {
       filters = sortValue.map(item => ({ [item.field]: item.direction }))
@@ -583,12 +614,12 @@ module.exports = class ContentCollection {
     return modelNames
   }
 
-  getExposedControlsModelNames () {
-    return this.getExposedControlFields().map(control => control.model)
-  }
+  // ---------------------------------------------------------------------------
+  // Exposed Control Methods
+  // ---------------------------------------------------------------------------
 
-  getPaginationModelName () {
-    return this.getDefault('ExposedControlPaginationModel')
+  getExposedControlModelNames () {
+    return this.getExposedControlFields().map(control => control.model)
   }
 
   getExposedControlFields () {
@@ -599,7 +630,7 @@ module.exports = class ContentCollection {
     return controls.filter(item => item !== null)
   }
 
-  getExposedControlsForm () {
+  getExposedControlForm () {
     let returnControlForm = null
     const fields = []
     const model = {}
@@ -632,6 +663,28 @@ module.exports = class ContentCollection {
     return returnControlForm
   }
 
+  getExposedControlValues (field) {
+    let returnValues = null
+    if (field) {
+      returnValues = field.values.map(item => {
+        return {
+          id: item.name.toString(), // TODO - Consider using a URI friendly name?
+          name: item.name,
+          value: item.value
+        }
+      })
+    }
+    return returnValues
+  }
+
+  getExposedSortValues () {
+    return this.getExposedControlValues(this.getDisplaySort())
+  }
+
+  getExposedItemsToLoadValues () {
+    return this.getExposedControlValues(this.getDisplayItemsToLoad())
+  }
+
   getSortValueFromId (option) {
     let returnSortValue = null
     const sortValues = this.getExposedSortValues()
@@ -644,65 +697,74 @@ module.exports = class ContentCollection {
     return returnSortValue
   }
 
-  getExposedSortValues () {
-    let returnSortValues = null
-    const sort = this.config?.interface?.display?.options?.sort
-    if (sort) {
-      returnSortValues = sort.values.map(item => {
-        return {
-          id: item.name, // TODO - Consider using a URI friendly name?
-          name: item.name,
-          value: item.value
-        }
-      })
+  getExposedFieldDefaultValue (options) {
+    // Returns the first item as default value
+    let returnDefaultValue = ''
+    if (options.length > 0) {
+      returnDefaultValue = options[0].id
     }
-    return returnSortValues
+    return returnDefaultValue
   }
 
   getExposedSortField () {
-    let returnSortFields = null
-    const sortValues = this.getExposedSortValues()
-    if (sortValues) {
-      returnSortFields = {
-        model: this.getDefault('ExposedControlSortModel'),
-        value: sortValues[0].id,
+    let returnField = null
+    const exposedValues = this.getExposedSortValues()
+    if (exposedValues) {
+      returnField = {
+        model: this.getSortModelName(),
+        value: this.getExposedFieldDefaultValue(exposedValues),
         field: {
           type: 'rplselect',
-          model: this.getDefault('ExposedControlSortModel'),
+          model: this.getSortModelName(),
           label: this.getDefault('ExposedControlSortLabel'),
           placeholder: this.getDefault('ExposedControlSortPlaceholder'),
-          values: sortValues.map(({ id, name }) => ({ id, name })),
-          styleClasses: ['app-content-collection__form-inline']
-        }
-      }
-    }
-    return returnSortFields
-  }
-
-  getExposedItemsToLoadField () {
-    let returnField = null
-    const itemsToLoad = this.config?.interface?.display?.options?.itemsToLoad
-    if (itemsToLoad) {
-      const values = itemsToLoad.values.map(item => {
-        return {
-          id: item.name.toString(),
-          name: item.name
-        }
-      })
-      returnField = {
-        model: this.getDefault('ExposedControlItemsPerPageModel'),
-        value: values[0].id,
-        field: {
-          type: 'rplselect',
-          model: this.getDefault('ExposedControlItemsPerPageModel'),
-          label: this.getDefault('ExposedControlItemsPerPageLabel'),
-          placeholder: this.getDefault('ExposedControlItemsPerPagePlaceholder'),
-          values: values,
+          values: exposedValues.map(({ id, name }) => ({ id, name })),
           styleClasses: ['app-content-collection__form-inline']
         }
       }
     }
     return returnField
+  }
+
+  getExposedItemsToLoadField () {
+    let returnField = null
+    const exposedValues = this.getExposedItemsToLoadValues()
+    if (exposedValues) {
+      returnField = {
+        model: this.getItemsPerPageModelName(),
+        value: this.getExposedFieldDefaultValue(exposedValues),
+        field: {
+          type: 'rplselect',
+          model: this.getItemsPerPageModelName(),
+          label: this.getDefault('ExposedControlItemsPerPageLabel'),
+          placeholder: this.getDefault('ExposedControlItemsPerPagePlaceholder'),
+          values: exposedValues.map(({ id, name }) => ({ id, name })),
+          styleClasses: ['app-content-collection__form-inline']
+        }
+      }
+    }
+    return returnField
+  }
+
+  // ---------------------------------------------------------------------------
+  // State Methods
+  // ---------------------------------------------------------------------------
+  getDefaultState () {
+    const defaultState = {}
+    if (this.getDisplayPagination()) {
+      defaultState[this.getPaginationModelName()] = 1
+    }
+    defaultState[this.getSortModelName()] = this.getInitialSort()
+    defaultState[this.getItemsPerPageModelName()] = this.getInitialItemsToLoad()
+    const advancedFilters = this.getExposedFilterGroups()
+    advancedFilters.forEach(group => {
+      if (group.models) {
+        group.models.forEach((model, idx) => {
+          defaultState[model] = group.values[idx]
+        })
+      }
+    })
+    return defaultState
   }
 
   // ---------------------------------------------------------------------------
@@ -722,62 +784,6 @@ module.exports = class ContentCollection {
       total: results.hits.total,
       aggregations: results.aggregations
     }
-  }
-
-  getDefaultState () {
-    // TODO - Populate based on exposed filter defaults.
-    return {
-      page: 1,
-      items_per_page: '5',
-      sort: 'Relevance',
-      q: '',
-      type: '',
-      filter_b: []
-    }
-  }
-
-  getItemsToLoad (state) {
-    const modelName = this.getDefault('ExposedControlItemsPerPageModel')
-    let loadCount = this.getInternalItemsToLoad() || this.getDefault('ItemsToLoad')
-    if (state[modelName]) {
-      loadCount = state.items_per_page
-    }
-    return loadCount
-  }
-
-  getStartingItem (state) {
-    const modelName = this.getDefault('ExposedControlPaginationModel')
-    let start = 0
-    if (state[modelName]) {
-      const total = this.getItemsToLoad(state)
-      start = (state.page - 1) * total
-    }
-    return start
-  }
-
-  getResultCountRange (state, count) {
-    let returnCountRange = false
-    if (count && count > 0) {
-      const initialStep = state.page
-      const itemsPerPage = state.items_per_page
-      const from = initialStep < 2 ? 1 : (itemsPerPage * (initialStep - 1)) + 1
-      const byPage = itemsPerPage * initialStep
-      const total = (byPage > count) ? count : byPage
-      returnCountRange = `${from}-${total}`
-    }
-    return returnCountRange
-  }
-
-  getProcessedResultsCount (state, count) {
-    let text = this.getDisplayResultCountText()
-    const range = this.getResultCountRange(state, count)
-    text = text.replace('{range}', range)
-    text = text.replace('{count}', count)
-    return text
-  }
-
-  getPaginationTotalSteps (state, count) {
-    return Math.ceil(parseInt(count) / this.getItemsToLoad(state))
   }
 
   // ---------------------------------------------------------------------------
@@ -808,5 +814,72 @@ module.exports = class ContentCollection {
         break
     }
     return mappedResult
+  }
+
+  // ---------------------------------------------------------------------------
+  // Search Result Data Methods
+  // ---------------------------------------------------------------------------
+  getInitialControlValue (internal, display, displayValues) {
+    let returnValue = internal
+    if (display) {
+      const defaultValue = this.getExposedFieldDefaultValue(displayValues)
+      if (defaultValue) {
+        returnValue = defaultValue
+      }
+    }
+    return returnValue
+  }
+
+  getInitialSort () {
+    const initial = this.getInternalSort()
+    return this.getInitialControlValue(initial, this.getDisplaySort(), this.getExposedSortValues())
+  }
+
+  getInitialItemsToLoad () {
+    const initial = this.getInternalItemsToLoad() || this.getDefault('ItemsToLoad')
+    return this.getInitialControlValue(initial, this.getDisplayItemsToLoad(), this.getExposedItemsToLoadValues())
+  }
+
+  getItemsToLoad (state) {
+    let loadCount = this.getInitialItemsToLoad()
+    const model = this.getItemsPerPageModelName()
+    if (state[model]) {
+      loadCount = state[model]
+    }
+    return loadCount
+  }
+
+  getStartingItem (state) {
+    let start = 0
+    const initialStep = state[this.getPaginationModelName()]
+    if (initialStep) {
+      start = (initialStep - 1) * this.getItemsToLoad(state)
+    }
+    return start
+  }
+
+  getResultCountRange (state, count) {
+    let returnCountRange = false
+    if (count && count > 0) {
+      const initialStep = state[this.getPaginationModelName()]
+      const itemsPerPage = state[this.getItemsPerPageModelName()]
+      const from = initialStep < 2 ? 1 : (itemsPerPage * (initialStep - 1)) + 1
+      const byPage = itemsPerPage * initialStep
+      const total = (byPage > count) ? count : byPage
+      returnCountRange = `${from}-${total}`
+    }
+    return returnCountRange
+  }
+
+  getProcessedResultsCount (state, count) {
+    let text = this.getDisplayResultCountText()
+    const range = this.getResultCountRange(state, count)
+    text = text.replace('{range}', range)
+    text = text.replace('{count}', count)
+    return text
+  }
+
+  getPaginationTotalSteps (state, count) {
+    return Math.ceil(parseInt(count) / this.getItemsToLoad(state))
   }
 }
