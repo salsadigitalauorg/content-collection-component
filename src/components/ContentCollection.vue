@@ -90,6 +90,7 @@ export default {
   props: {
     schema: Object,
     initialState: Object,
+    environment: Object,
     sidebar: {
       type: Boolean,
       default: false
@@ -97,12 +98,7 @@ export default {
   },
   data () {
     const searchEndpoint = this.searchEndpoint.bind(this)
-    const environment = {
-      siteId: '4',
-      primarySiteId: '4',
-      domains: { '4': '' }
-    }
-    const dataManager = new ContentCollection(this.schema, searchEndpoint, environment)
+    const dataManager = new ContentCollection(this.schema, searchEndpoint, this.environment)
     return {
       dataManager,
       defaultState: dataManager.getDefaultState(),
@@ -148,6 +144,9 @@ export default {
     },
     showPagination () {
       return this.paginationData && this.paginationData.totalSteps > 1
+    },
+    paginationModelName () {
+      return this.dataManager.getPaginationModelName()
     }
   },
   methods: {
@@ -196,18 +195,26 @@ export default {
         }
       })
     },
+    resetPagination () {
+      this.state[this.paginationModelName] = 1
+    },
+    setPaginationFromState () {
+      if (this.paginationData) {
+        this.paginationData.initialStep = parseInt(this.state[this.paginationModelName])
+      }
+    },
     paginationChange (value) {
       this.syncTo({ page: value }, this.state)
       this.updateQuery()
     },
     exposedFilterFormSubmit () {
       this.syncTo(this.exposedFilterFormData.model, this.state)
-      this.state.page = 1
+      this.resetPagination()
       this.updateQuery()
     },
     exposedControlsFormSubmit () {
       this.syncTo(this.exposedControlsFormData.model, this.state)
-      this.state.page = 1
+      this.resetPagination()
       this.updateQuery()
     },
     updateQuery () {
@@ -224,10 +231,7 @@ export default {
       if (this.exposedControlsFormData) {
         this.syncTo(this.state, this.exposedControlsFormData.model, this.exposedControlModels)
       }
-      // TODO - The pagination implementation could be cleaner.
-      if (this.paginationData) {
-        this.paginationData.initialStep = parseInt(this.state.page)
-      }
+      this.setPaginationFromState()
     }
   },
   watch: {

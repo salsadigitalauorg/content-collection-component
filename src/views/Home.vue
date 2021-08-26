@@ -1,6 +1,6 @@
 <template>
   <div id="app">
-    <content-collection :schema="schema" />
+    <content-collection :schema="schema" :environment="environment" />
   </div>
 </template>
 
@@ -14,6 +14,11 @@ export default {
   },
   data () {
     return {
+      environment: {
+        siteId: '4',
+        primarySiteId: '4',
+        domains: { '4': '' }
+      },
       schema: {
         title: "Content Collection",
         description: "Aliqua commodo mollit enim nulla minim sit ut ullamco ea dolore non consectetur eu laborum. Aliqua commodo mollit enim nulla minim sit ut ullamco ea dolore non consectetur eu laborum. Aliqua commodo mollit enim nulla minim sit ut ullamco ea dolore non consectetur eu laborum. ",

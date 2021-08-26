@@ -574,6 +574,10 @@ module.exports = class ContentCollection {
     return this.getExposedControlFields().map(control => control.model)
   }
 
+  getPaginationModelName () {
+    return this.getDefault('ExposedControlPaginationModel')
+  }
+
   getExposedControlFields () {
     const controls = [
       this.getExposedSortField(),
