@@ -256,6 +256,10 @@ export default {
 @import "~@dpc-sdp/ripple-global/scss/tools";
 
 $app-content-collection-form-gutter: .75rem;
+$rpl-search-form-button-width: rem(28px) !default;
+$rpl-search-form-show-filters-ruleset: ('s', .87em, 'bold') !default;
+$rpl-search-form-search-button-text: $rpl-search-form-show-filters-ruleset !default;
+$rpl-search-form-search-button-text-color: rpl-color('primary') !default;
 
 .app-content-collection {
   &__header {
@@ -274,7 +278,8 @@ $app-content-collection-form-gutter: .75rem;
       &-right {
         .rpl-link {
           white-space: nowrap;
-          display: inline
+          display: inline;
+          margin-left: $rpl-component-gutter-l;
         }
       }
     }
@@ -283,9 +288,8 @@ $app-content-collection-form-gutter: .75rem;
         white-space: nowrap;
         margin-bottom: $rpl-component-gutter-l;
         display: inline-block;
-        @include rpl-breakpoint('m') {
-          margin-left: $rpl-component-gutter-l;
-        }
+        color: rpl-color('primary');
+        @include rpl-typography-font('s', 1.2rem, 'semibold');
       }
     }
   }
@@ -354,38 +358,74 @@ $app-content-collection-form-gutter: .75rem;
     margin-left: $rpl-component-gutter-l
   }
 
-  .rpl-search-results-layout__sort {
-    .rpl-form {
-      .form-group {
-        margin-left: $app-content-collection-form-gutter;
-        margin-right: $app-content-collection-form-gutter;
-        width: 100%;
-        @include rpl-breakpoint('m') {
-          display: flex;
-          flex-direction: row;
-          align-items: center;
-          width: auto;
-          margin-right: 0;
-          label:not(.rpl-option-button__label) {
-            margin-bottom: 0;
-            margin-right: $rpl-space-3;
-          }
-          .rpl-select__trigger {
-            padding-right: $rpl-component-gutter-l * 2;
-          }
+  // Search form styles
+  .rpl-search-form {
+    $root: &;
+    &__btn {
+      background-color: transparent;
+      border: 0;
+      padding: 0;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      @include rpl_print_hidden;
+
+      @at-root {
+        #{$root}--dark #{$root}__btn {
+          @include rpl_focus_dark;
         }
       }
-    }
-    .app-content-collection__form-inline + .app-content-collection__form-inline {
-      @include rpl-breakpoint('m') {
-        margin-left: $rpl-component-gutter-l;
-        margin-right: 0;
+
+      span {
+        @include rpl_typography_ruleset($rpl-search-form-search-button-text);
+        color: $rpl-search-form-search-button-text-color;
+        margin-right: $rpl-space-2;
+      }
+
+      svg {
+        width: $rpl-search-form-button-width;
+        height: $rpl-search-form-button-width;
       }
     }
   }
 
-  .rpl-search-results-layout__header {
-    display: block;
+  // Search results layout
+  .rpl-search-results-layout {
+    &__info {
+      @include rpl-typography-font('s', 1.2rem, 'medium');
+    }
+    &__sort {
+      .rpl-form {
+        .form-group {
+          margin-left: $app-content-collection-form-gutter;
+          margin-right: $app-content-collection-form-gutter;
+          width: 100%;
+          @include rpl-breakpoint('m') {
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            width: auto;
+            margin-right: 0;
+            label:not(.rpl-option-button__label) {
+              margin-bottom: 0;
+              margin-right: $rpl-space-3;
+            }
+            .rpl-select__trigger {
+              padding-right: $rpl-component-gutter-l * 2;
+            }
+          }
+        }
+      }
+      .app-content-collection__form-inline + .app-content-collection__form-inline {
+        @include rpl-breakpoint('m') {
+          margin-left: $rpl-component-gutter-l;
+          margin-right: 0;
+        }
+      }
+    }
+    &__header {
+      display: block;
+    }
   }
 
   .rpl-clearform {
@@ -397,6 +437,10 @@ $app-content-collection-form-gutter: .75rem;
     // Remove default fieldset margins.
     margin-left: 0;
     margin-right: 0;
+  }
+
+  hr {
+    border: 1px solid rpl-color('mid_neutral_1');
   }
 }
 </style>
