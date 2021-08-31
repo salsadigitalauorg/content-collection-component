@@ -91,6 +91,18 @@ module.exports = class ContentCollection {
     return JSON.parse(JSON.stringify(obj))
   }
 
+  stripEmptyArray (obj) {
+    Object.keys(obj).forEach(key => {
+      if (Array.isArray(obj[key])) {
+        if (obj[key].length === 0) {
+          delete obj[key]
+        }
+      } else if (typeof obj[key] === 'object') {
+        this.stripEmptyArray(obj[key])
+      }
+    })
+  }
+
   getNewValue (value) {
     return Array.isArray(value) ? [...value] : value
   }
@@ -109,7 +121,7 @@ module.exports = class ContentCollection {
   }
 
   getStateValue (state, defaultKey) {
-    return state[this.getDefault(defaultKey)]
+    return state?.[this.getDefault(defaultKey)]
   }
 
   // ---------------------------------------------------------------------------
@@ -243,6 +255,8 @@ module.exports = class ContentCollection {
   }
 
   getSimpleDSL (state) {
+    // TODO - I feel this function is getting too big.
+    // I think there might be some way we can simplify it.
     const siteId = this.envConfig.siteId
     // contentIds
     const contentIdFilters = this.getSimpleDSLContentIds()
@@ -269,7 +283,8 @@ module.exports = class ContentCollection {
           must_not: []
         }
       },
-      sort: []
+      sort: [],
+      aggs: []
     }
 
     if (exposedKeyword) {
@@ -318,6 +333,8 @@ module.exports = class ContentCollection {
     if (sortFilters.length > 0) {
       body.sort = sortFilters
     }
+
+    this.stripEmptyArray(body)
 
     return body
   }
