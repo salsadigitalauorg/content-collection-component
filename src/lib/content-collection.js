@@ -655,7 +655,8 @@ module.exports = class ContentCollection {
     })
 
     if (fields.length > 0) {
-      // TODO - Health Specific
+      // TODO - Health Specific - you can move this into the HealthContentCollection
+      // and remove from here when forms gets auto-submit support.
       fields.push({
         type: 'rplsubmitloader',
         buttonText: 'Go',

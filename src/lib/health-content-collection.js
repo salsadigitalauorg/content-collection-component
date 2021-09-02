@@ -40,7 +40,6 @@ export default class HealthContentCollection extends ContentCollection {
         mappedResult = super.mapResult(item)
         break
     }
-    console.log(mappedResult)
     return mappedResult
   }
 
