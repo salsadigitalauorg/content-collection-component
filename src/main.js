@@ -4,10 +4,12 @@ import '@dpc-sdp/ripple-global/style.scss'
 import RplGlobal from '@dpc-sdp/ripple-global'
 import router from './router'
 import elasticSearch from './lib/es.js'
+import VhSearchResult from './components/VhSearchResult.vue'
 
 Vue.config.productionTip = false
 
 Vue.use(RplGlobal, {})
+Vue.component('vh-search-result', VhSearchResult)
 
 // Mock Tide Search API.
 const tideSearchApi = {

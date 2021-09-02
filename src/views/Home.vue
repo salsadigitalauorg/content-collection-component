@@ -178,8 +178,30 @@ export default {
               }
             },
             resultComponent: {
-              type: 'search-result'
-              // type: 'basic-card'
+              // type: 'search-result'
+              // type: 'card'
+              type: 'vh-search-result',
+              options: {
+                "icon": { "type": "icon", "symbol": "audio" },
+                "title": { "type": "text", "field": "title" },
+                "date": { "type": "date", "field": "field_start_date", "format": "DD MMM YYYY" },
+                "subTop": {
+                  "type": "formatted",
+                  "fields": [
+                    { "type": "text", "field": "title" }
+                  ],
+                  "format": "Conviction number: {title}"
+                },
+                "summary": { "type": "text", "field": "field_landing_page_summary" },
+                "subBottom": {
+                  "type": "formatted",
+                  "fields": [
+                    { "type": "date", "field": "created", "format": "DD MMM" },
+                    { "type": "date", "field": "modified", "format": "DD MMM YYYY" },
+                  ],
+                  "format": "Created: {created} | Modified: {modified}"
+                }
+              }
             }
           }
         }

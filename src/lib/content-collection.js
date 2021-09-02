@@ -189,9 +189,6 @@ module.exports = class ContentCollection {
   getDisplayResultComponentName () {
     let returnName = null
     switch (this.getDisplayResultComponentType()) {
-      case 'search-result':
-        returnName = 'rpl-search-result'
-        break
       case 'basic-card':
       default:
         returnName = 'rpl-card-promo'
@@ -812,14 +809,6 @@ module.exports = class ContentCollection {
     const link = this.getLocalisedLink(_source.url)
 
     switch (this.getDisplayResultComponentType()) {
-      case 'search-result':
-        mappedResult = {
-          title: _source.title?.[0],
-          link: { linkText: link, linkUrl: link },
-          date: _source.created?.[0],
-          description: _source.field_landing_page_summary?.[0]
-        }
-        break
       case 'card':
       default:
         mappedResult = {
