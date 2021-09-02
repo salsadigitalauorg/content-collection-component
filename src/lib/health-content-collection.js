@@ -26,7 +26,7 @@ export default class HealthContentCollection extends ContentCollection {
 
     switch (this.getDisplayResultComponentType()) {
       case 'vh-search-result':
-        mappedResult = this.vhSearchResultMapping(item)
+        mappedResult = this.vhSearchResultMapping(item, link)
         break
       case 'search-result':
         mappedResult = {
@@ -43,15 +43,16 @@ export default class HealthContentCollection extends ContentCollection {
     return mappedResult
   }
 
-  vhSearchResultMapping (item) {
+  vhSearchResultMapping (item, link) {
     const options = this.config.interface?.display?.resultComponent?.options
     return {
-      icon: this.getVhSearchResultValue(options.icon, item),
-      title: this.getVhSearchResultValue(options.title, item),
-      date: this.getVhSearchResultValue(options.date, item),
-      subTop: this.getVhSearchResultValue(options.subTop, item),
-      summary: this.getVhSearchResultValue(options.summary, item),
-      subBottom: this.getVhSearchResultValue(options.subBottom, item)
+      icon: (options.icon) ? this.getVhSearchResultValue(options.icon, item) : null,
+      title: (options.title) ? this.getVhSearchResultValue(options.title, item) : null,
+      link: { linkText: link, linkUrl: link },
+      date: (options.date) ? this.getVhSearchResultValue(options.date, item) : null,
+      subTop: (options.subTop) ? this.getVhSearchResultValue(options.subTop, item) : null,
+      summary: (options.summary) ? this.getVhSearchResultValue(options.summary, item) : null,
+      subBottom: (options.subBottom) ? this.getVhSearchResultValue(options.subBottom, item) : null
     }
   }
 

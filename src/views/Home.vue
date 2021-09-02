@@ -26,7 +26,7 @@ export default {
         internal: {
           itemsToLoad: 20,
           // contentIds: ['7', '10', 15211, 14809],
-          // contentTypes: ['landing_page'],
+          contentTypes: ['health_alert'],
           contentFields: {
             // field_topic: { operator: 'AND', values: ['110', '439', '4223', '601'] },
             // field_tags: { operator: 'AND', values: ['108'] }
@@ -108,6 +108,7 @@ export default {
                     { id: 'landing_page', name: 'Landing Page' },
                     { id: 'record_page', name: 'Record Page' },
                     { id: 'conviction_record', name: 'Conviction Record' },
+                    { id: 'health_alert', name: 'Health Alert' },
                   ]
                 },
                 additionalClasses: [ 'app-content-collection__form-col-3' ],
@@ -178,30 +179,56 @@ export default {
               }
             },
             resultComponent: {
-              // type: 'search-result'
-              // type: 'card'
+              // type: 'search-result',
+              // type: 'card',
               type: 'vh-search-result',
+
+              // Health Alert mapping
               options: {
-                "icon": { "type": "icon", "symbol": "audio" },
                 "title": { "type": "text", "field": "title" },
-                "date": { "type": "date", "field": "field_start_date", "format": "DD MMM YYYY" },
-                "subTop": {
+                // field_health_date_issued is not in results atm
+                // "date": { "type": "date", "field": "changed", "format": "DD MMM YYYY" },
+                "summary": { 
                   "type": "formatted",
                   "fields": [
-                    { "type": "text", "field": "title" }
+                    { "type": "date", "field": "changed", "format": "DD MMM YYYY" },
+                    { "type": "text", "field": "field_health_type" },
+                    { "type": "date", "field": "created", "format": "DD MMMM YYYY" },
                   ],
-                  "format": "Conviction number: {title}"
+                  "format": "{changed} - Update to <code>{field_health_type}</code> issued {created}"
                 },
-                "summary": { "type": "text", "field": "field_landing_page_summary" },
                 "subBottom": {
                   "type": "formatted",
                   "fields": [
-                    { "type": "date", "field": "created", "format": "DD MMM" },
-                    { "type": "date", "field": "modified", "format": "DD MMM YYYY" },
+                    { "type": "text", "field": "field_health_status" },
+                    { "type": "text", "field": "field_health_type" },
+                    { "type": "text", "field": "field_health_alert_number" },
                   ],
-                  "format": "Created: {created} | Modified: {modified}"
+                  "format": "{field_health_status} | {field_health_type} {field_health_alert_number}"
                 }
-              }
+              },
+
+              // options: {
+              //   "icon": { "type": "icon", "symbol": "audio" },
+              //   "title": { "type": "text", "field": "title" },
+              //   "date": { "type": "date", "field": "field_start_date", "format": "DD MMM YYYY" },
+              //   "subTop": {
+              //     "type": "formatted",
+              //     "fields": [
+              //       { "type": "text", "field": "title" }
+              //     ],
+              //     "format": "Conviction number: {title}"
+              //   },
+              //   "summary": { "type": "text", "field": "field_landing_page_summary" },
+              //   "subBottom": {
+              //     "type": "formatted",
+              //     "fields": [
+              //       { "type": "date", "field": "created", "format": "DD MMM" },
+              //       { "type": "date", "field": "modified", "format": "DD MMM YYYY" },
+              //     ],
+              //     "format": "Created: {created} | Modified: {modified}"
+              //   }
+              // }
             }
           }
         }
