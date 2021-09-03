@@ -26,7 +26,7 @@ export default {
         internal: {
           itemsToLoad: 20,
           // contentIds: ['7', '10', 15211, 14809],
-          contentTypes: ['health_alert'],
+          contentTypes: ['landing_page'],
           contentFields: {
             // field_topic: { operator: 'AND', values: ['110', '439', '4223', '601'] },
             // field_tags: { operator: 'AND', values: ['108'] }
@@ -182,53 +182,27 @@ export default {
               // type: 'search-result',
               // type: 'card',
               type: 'vh-search-result',
-
-              // Health Alert mapping
               options: {
+                "icon": { "type": "icon", "symbol": "audio" },
                 "title": { "type": "text", "field": "title" },
-                // field_health_date_issued is not in results atm
-                // "date": { "type": "date", "field": "changed", "format": "DD MMM YYYY" },
-                "summary": { 
+                "date": { "type": "date", "field": "field_start_date", "format": "DD MMM YYYY" },
+                "subTop": {
                   "type": "formatted",
                   "fields": [
-                    { "type": "date", "field": "changed", "format": "DD MMM YYYY" },
-                    { "type": "text", "field": "field_health_type" },
-                    { "type": "date", "field": "created", "format": "DD MMMM YYYY" },
+                    { "type": "text", "field": "title" }
                   ],
-                  "format": "{changed} - Update to <code>{field_health_type}</code> issued {created}"
+                  "format": "Conviction number: {title}"
                 },
+                "summary": { "type": "text", "field": "field_landing_page_summary" },
                 "subBottom": {
                   "type": "formatted",
                   "fields": [
-                    { "type": "text", "field": "field_health_status" },
-                    { "type": "text", "field": "field_health_type" },
-                    { "type": "text", "field": "field_health_alert_number" },
+                    { "type": "date", "field": "created", "format": "DD MMM" },
+                    { "type": "date", "field": "modified", "format": "DD MMM YYYY" },
                   ],
-                  "format": "{field_health_status} | {field_health_type} {field_health_alert_number}"
+                  "format": "Created: {created} | Modified: {modified}"
                 }
-              },
-
-              // options: {
-              //   "icon": { "type": "icon", "symbol": "audio" },
-              //   "title": { "type": "text", "field": "title" },
-              //   "date": { "type": "date", "field": "field_start_date", "format": "DD MMM YYYY" },
-              //   "subTop": {
-              //     "type": "formatted",
-              //     "fields": [
-              //       { "type": "text", "field": "title" }
-              //     ],
-              //     "format": "Conviction number: {title}"
-              //   },
-              //   "summary": { "type": "text", "field": "field_landing_page_summary" },
-              //   "subBottom": {
-              //     "type": "formatted",
-              //     "fields": [
-              //       { "type": "date", "field": "created", "format": "DD MMM" },
-              //       { "type": "date", "field": "modified", "format": "DD MMM YYYY" },
-              //     ],
-              //     "format": "Created: {created} | Modified: {modified}"
-              //   }
-              // }
+              }
             }
           }
         }
