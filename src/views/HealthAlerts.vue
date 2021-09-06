@@ -21,23 +21,11 @@ export default {
       },
       schema: {
         title: "Health Alerts",
-        description: "Aliqua commodo mollit enim nulla minim sit ut ullamco ea dolore non consectetur eu laborum. Aliqua commodo mollit enim nulla minim sit ut ullamco ea dolore non consectetur eu laborum. Aliqua commodo mollit enim nulla minim sit ut ullamco ea dolore non consectetur eu laborum. ",
+        description: "Aliqua commodo mollit enim nulla minim sit ut ullamco ea dolore non consectetur eu laborum. ",
         callToAction: { text: 'View all', url: '/search' },
         internal: {
           itemsToLoad: 20,
-          // contentIds: ['7', '10', 15211, 14809],
           contentTypes: ['health_alert'],
-          contentFields: {
-            // field_topic: { operator: 'AND', values: ['110', '439', '4223', '601'] },
-            // field_tags: { operator: 'AND', values: ['108'] }
-          },
-          dateFilter: {
-            criteria: 'this_month',
-            startDateField: 'created',
-            endDateField: 'created',
-            dateRangeStart: '2021-01-17T00:00:00+10:00',
-            dateRangeEnd: '2021-12-19T23:59:59+10:00'
-          },
           sort: [
             { field: 'created', direction: 'desc' }
           ]
@@ -61,16 +49,13 @@ export default {
               {
                 type: 'basic',
                 options: {
-                  model: 'type',
+                  model: 'field_health_status',
                   type: 'rplselect',
-                  label: 'Type',
-                  hint: 'The content type to filter by',
-                  placeholder: 'Select type',
+                  label: 'Health alert status',
+                  placeholder: 'Select an alert status',
                   values: [
-                    { id: 'landing_page', name: 'Landing Page' },
-                    { id: 'record_page', name: 'Record Page' },
-                    { id: 'conviction_record', name: 'Conviction Record' },
-                    { id: 'health_alert', name: 'Health Alert' }
+                    { id: 'active', name: 'Active' },
+                    { id: 'resolved', name: 'Resolved' }
                   ]
                 },
                 additionalClasses: [ 'app-content-collection__form-col-3' ],
@@ -80,30 +65,18 @@ export default {
               {
                 type: 'basic',
                 options: {
-                  model: 'field_tags_name',
+                  model: 'field_health_type',
                   type: 'rplselect',
-                  multiselect: true,
-                  label: 'Tags',
-                  placeholder: 'Select some tags',
-                  values: []
+                  label: 'Health alert type',
+                  placeholder: 'Select an alert type',
+                  values: [
+                    { id: 'health-alerts', name: 'Alert' },
+                    { id: 'health-advisories', name: 'Advisory' }
+                  ]
                 },
                 additionalClasses: [ 'app-content-collection__form-col-3' ],
-                'elasticsearch-field': 'field_tags_name',
-                'elasticsearch-aggregation': true
-              },
-              {
-                type: 'basic',
-                options: {
-                  model: 'field_topic_name',
-                  type: 'rplselect',
-                  multiselect: true,
-                  label: 'Topic',
-                  placeholder: 'Select a topic',
-                  values: []
-                },
-                additionalClasses: [ 'app-content-collection__form-col-3' ],
-                'elasticsearch-field': 'field_topic',
-                'elasticsearch-aggregation': true
+                'elasticsearch-field': 'field_health_type',
+                'elasticsearch-aggregation': false
               }
             ]
           },
@@ -141,8 +114,6 @@ export default {
               }
             },
             resultComponent: {
-              // type: 'search-result'
-              // type: 'card'
               type: 'vh-search-result',
               options: {
                 "title": { "type": "text", "field": "title" },
