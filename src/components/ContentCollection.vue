@@ -16,7 +16,7 @@
       :formData="exposedFilterFormData"
       :submitHandler="exposedFilterFormSubmit"
     />
-    <hr v-if="exposedFilterFormData" />
+    <rpl-divider v-if="exposedFilterFormData" />
     <!-- Search Results -->
     <rpl-search-results-layout
       :searchResults="results"
@@ -74,6 +74,7 @@ import ContentCollection from '../lib/health-content-collection.js'
 import RplPagination from '@dpc-sdp/ripple-pagination'
 import { RplSearchResultsLayout, RplSearchResult } from '@dpc-sdp/ripple-search'
 import { RplCardPromo } from '@dpc-sdp/ripple-card'
+import { RplDivider } from '@dpc-sdp/ripple-global'
 // TODO - We need to figure out how custom result components can be loaded.
 
 export default {
@@ -83,6 +84,7 @@ export default {
     RplLink,
     RplForm,
     RplCol,
+    RplDivider,
     RplSearchResultsLayout,
     RplSearchResult,
     RplCardPromo,
@@ -438,10 +440,6 @@ $rpl-search-form-search-button-text-color: rpl-color('primary') !default;
     // Remove default fieldset margins.
     margin-left: 0;
     margin-right: 0;
-  }
-
-  hr {
-    border: 1px solid rpl-color('mid_neutral_1');
   }
 }
 </style>
