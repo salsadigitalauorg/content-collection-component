@@ -245,6 +245,8 @@ module.exports = class ContentCollection {
   // DSL Methods
   // ---------------------------------------------------------------------------
   getDSL (state) {
+    // console.log(JSON.stringify(this.config, null, 2))
+
     let returnDSL = null
     if (this.config?.internal?.custom) {
       // Return Custom DSL if available.

@@ -27,7 +27,13 @@ module.exports = async function elasticSearch (esRequest) {
       sort: esRequest.sort,
       aggs: esRequest.aggs
     }
+    console.log('REQUEST')
+    console.log(req)
     const response = await esClient.search(req)
+
+    console.log('RESPONSE')
+    console.log(response)
+
     return response
   } catch (error) {
     console.trace(error.message)

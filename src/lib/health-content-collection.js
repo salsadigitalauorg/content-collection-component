@@ -26,6 +26,7 @@ export default class HealthContentCollection extends ContentCollection {
 
     switch (this.getDisplayResultComponentType()) {
       case 'vh-search-result':
+        console.log(item._source.field_health_type)
         mappedResult = this.vhSearchResultMapping(item, link)
         break
       case 'search-result':
