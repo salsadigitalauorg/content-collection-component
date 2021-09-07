@@ -29,6 +29,7 @@ module.exports = class ContentCollection {
       ExposedFilterKeywordModel: 'q',
       ExposedFilterKeywordType: 'phrase_prefix',
       ExposedFilterKeywordDefaultFields: ['title', 'body', 'summary_processed', 'field_landing_page_summary', 'field_paragraph_summary', 'field_page_intro_text', 'field_paragraph_body'],
+      DisplayResultComponentCardStyle: 'noImage',
       DisplayResultComponentColumns: { m: 6, l: 4, xxxl: 3 },
       DisplayPaginationComponentColumns: { m: 6, l: 4, xxxl: 3 },
       ItemsToLoad: 10
@@ -175,6 +176,10 @@ module.exports = class ContentCollection {
     return this.config?.interface?.display?.options?.itemsToLoad
   }
 
+  getDisplayResultComponent () {
+    return this.config?.interface?.display?.resultComponent
+  }
+
   getDisplayResultComponentType () {
     return this.config?.interface?.display?.resultComponent?.type
   }
@@ -189,7 +194,7 @@ module.exports = class ContentCollection {
   getDisplayResultComponentName () {
     let returnName = null
     switch (this.getDisplayResultComponentType()) {
-      case 'basic-card':
+      case 'card':
       default:
         returnName = 'rpl-card-promo'
         break
@@ -200,7 +205,7 @@ module.exports = class ContentCollection {
   getDisplayResultComponentColumns () {
     let returnColumn = null
     switch (this.getDisplayResultComponentType()) {
-      case 'basic-card':
+      case 'card':
         returnColumn = this.getDefault('DisplayResultComponentColumns')
         break
     }
@@ -812,11 +817,14 @@ module.exports = class ContentCollection {
     switch (this.getDisplayResultComponentType()) {
       case 'card':
       default:
+        const style = this.getDisplayResultComponent()?.style
         mappedResult = {
           title: _source.title?.[0],
           link: { text: link, url: link },
           dateStart: _source.created?.[0],
-          summary: _source.field_landing_page_summary?.[0]
+          summary: _source.field_landing_page_summary?.[0],
+          image: _source.field_media_image_absolute_path?.[0],
+          displayStyle: style || this.getDefault('DisplayResultComponentCardStyle')
         }
         break
     }
@@ -880,9 +888,11 @@ module.exports = class ContentCollection {
 
   getProcessedResultsCount (state, count) {
     let text = this.getDisplayResultCountText()
-    const range = this.getResultCountRange(state, count)
-    text = text.replace('{range}', range)
-    text = text.replace('{count}', count)
+    if (text) {
+      const range = this.getResultCountRange(state, count)
+      text = text.replace('{range}', range)
+      text = text.replace('{count}', count)
+    }
     return text
   }
 
