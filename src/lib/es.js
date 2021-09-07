@@ -5,6 +5,7 @@ const SEARCH_HASH = '2a432d2d6146895f9ad3ce4b94b3ddac'
 const SEARCH_URL = 'elastic.sdp2.sdp.vic.gov.au'
 const SEARCH_AUTH_USERNAME = 'dpc'
 const SEARCH_AUTH_PASSWORD = 'ezh7BnY7'
+const debug = true
 
 const url = 'https://' + SEARCH_HASH + '.' + SEARCH_URL
 const testESOptions = {
@@ -27,12 +28,9 @@ module.exports = async function elasticSearch (esRequest) {
       sort: esRequest.sort,
       aggs: esRequest.aggs
     }
-    console.log('REQUEST')
-    console.log(req)
+    if (debug) console.log('REQUEST:', req)
     const response = await esClient.search(req)
-
-    console.log('RESPONSE')
-    console.log(response)
+    if (debug) console.log('RESPONSE', response)
 
     return response
   } catch (error) {

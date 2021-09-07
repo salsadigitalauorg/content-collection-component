@@ -245,6 +245,7 @@ module.exports = class ContentCollection {
   // DSL Methods
   // ---------------------------------------------------------------------------
   getDSL (state) {
+    // Use below to get a schema for pasting into the BE component.
     // console.log(JSON.stringify(this.config, null, 2))
 
     let returnDSL = null
