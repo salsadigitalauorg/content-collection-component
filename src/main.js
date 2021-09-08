@@ -14,7 +14,10 @@ Vue.component('vh-search-result', VhSearchResult)
 // Mock Tide Search API.
 const tideSearchApi = {
   searchByPost (body) {
-    return elasticSearch(body)
+    return elasticSearch.search(body)
+  },
+  setParams (params) {
+    elasticSearch.setESParams(params)
   }
 }
 Vue.mixin({
