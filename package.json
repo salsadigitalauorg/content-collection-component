@@ -5,6 +5,7 @@
   "scripts": {
     "serve": "vue-cli-service serve",
     "build": "vue-cli-service build",
+    "docs": "vue-cli-service build; rm -rf docs; mv dist docs",
     "postinstall": "patch-package"
   },
   "dependencies": {
