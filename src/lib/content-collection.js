@@ -1,4 +1,6 @@
 const moment = require('dayjs')
+// import { cardColsSetting } from '@dpc-sdp/ripple-nuxt-tide/lib/config/layout.config.js'
+const cardColsSetting = require('./layout.config.js')
 
 /**
  * ContentCollection
@@ -30,8 +32,8 @@ module.exports = class ContentCollection {
       ExposedFilterKeywordType: 'phrase_prefix',
       ExposedFilterKeywordDefaultFields: ['title', 'body', 'summary_processed', 'field_landing_page_summary', 'field_paragraph_summary', 'field_page_intro_text', 'field_paragraph_body'],
       DisplayResultComponentCardStyle: 'noImage',
-      DisplayResultComponentColumns: { m: 6, l: 4, xxxl: 3 },
-      DisplayPaginationComponentColumns: { m: 6, l: 4, xxxl: 3 },
+      DisplayResultComponentColumns: cardColsSetting,
+      DisplayPaginationComponentColumns: cardColsSetting,
       ItemsToLoad: 10
     }
     if (!this.searchClient) {
@@ -206,7 +208,8 @@ module.exports = class ContentCollection {
     let returnColumn = null
     switch (this.getDisplayResultComponentType()) {
       case 'card':
-        returnColumn = this.getDefault('DisplayResultComponentColumns')
+        const columnSettings = this.getDefault('DisplayResultComponentColumns')
+        returnColumn = this.envConfig?.sidebar ? columnSettings.narrow : columnSettings.wide
         break
     }
     return returnColumn
@@ -225,7 +228,8 @@ module.exports = class ContentCollection {
   }
 
   getDisplayPaginationComponentColumns () {
-    return this.getDefault('DisplayPaginationComponentColumns')
+    const columnSettings = this.getDefault('DisplayPaginationComponentColumns')
+    return this.envConfig?.sidebar ? columnSettings.narrow : columnSettings.wide
   }
 
   getDisplayPaginationData () {
