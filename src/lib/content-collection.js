@@ -267,6 +267,7 @@ module.exports = class ContentCollection {
     // contentFields
     const contentFieldFilters = this.getSimpleDSLContentFields()
     // includeCurrentPage
+    const currentPageFilter = this.getSimpleDSLCurrentPageFilter()
     // excludeIds
     // dateFilter
     const dateRangeFilters = this.getSimpleDSLDateRange()
@@ -291,6 +292,10 @@ module.exports = class ContentCollection {
 
     if (exposedKeyword) {
       body.query.bool.must.push(exposedKeyword)
+    }
+
+    if (currentPageFilter) {
+      body.query.bool.must_not.push(currentPageFilter)
     }
 
     if (advancedFilters) {
@@ -339,6 +344,18 @@ module.exports = class ContentCollection {
     this.stripEmptyArray(body)
 
     return body
+  }
+
+  getSimpleDSLCurrentPageFilter () {
+    let returnStatement = null
+    const includeCurrentPage = this.config?.internal?.includeCurrentPage
+    const excludeId = this.envConfig?.currentPage
+    if (!includeCurrentPage && excludeId) {
+      returnStatement = {
+        match: { nid: excludeId }
+      }
+    }
+    return returnStatement
   }
 
   getSimpleDSLExposedKeyword (state) {
