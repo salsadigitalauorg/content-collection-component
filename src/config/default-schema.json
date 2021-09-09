@@ -1,0 +1,30 @@
+{
+  "title": "Content Collection",
+  "internal": {
+    "itemsToLoad": 12,
+    "contentTypes": ["news"],
+    "dateFilter": {
+      "criteria": "range",
+      "startDateField": "created",
+      "endDateField": "created",
+      "dateRangeStart": "2021-01-01T00:00:00+10:00",
+      "dateRangeEnd": "2021-01-31T23:59:59+10:00"
+    },
+    "sort": [
+      { "field": "created", "direction": "desc" }
+    ]
+  },
+  "interface": {
+    "display": {
+      "type": "grid",
+      "options": {
+        "pagination": {
+          "type": "numbers"
+        }
+      },
+      "resultComponent": {
+        "type": "card"
+      }
+    }
+  }
+}
