@@ -134,6 +134,19 @@ module.exports = class ContentCollection {
     return returnState
   }
 
+  getTypeCorrectedQuery (query, defaultState) {
+    // Correct the type on state key if it's a string, but should be an array.
+    const returnQuery = {}
+    Object.keys(query).forEach(key => {
+      if (Array.isArray(defaultState[key]) && !Array.isArray(query[key])) {
+        returnQuery[key] = [query[key]]
+      } else {
+        returnQuery[key] = query[key]
+      }
+    })
+    return returnQuery
+  }
+
   getURLSafeString (str) {
     return str.toString()
   }
@@ -868,6 +881,42 @@ module.exports = class ContentCollection {
         break
     }
     return mappedResult
+  }
+
+  // ---------------------------------------------------------------------------
+  // Aggregation Methods
+  // ---------------------------------------------------------------------------
+  updateFiltersFromAggregation (aggregations, formData, state, disableFieldCallback) {
+    Object.keys(aggregations).forEach(model => {
+      formData.schema.groups.forEach(group => {
+        group.fields.forEach(field => {
+          if (field.model === model) {
+            let values = this.getAggregatedFilterValues(aggregations[model].buckets, state[model])
+            field.values = values
+            const disableField = (values.length === 0)
+            disableFieldCallback(field, disableField)
+          }
+        })
+      })
+    })
+  }
+
+  getAggregatedFilterValues (buckets, stateValue) {
+    let returnValues = []
+    if (buckets.length > 0) {
+      // Has Aggregations
+      returnValues = buckets.map(({ key, doc_count: count }) => {
+        return { id: key, name: `${key} (${count})` }
+      })
+    } else {
+      // No result aggregations - return state value
+      if (stateValue && Array.isArray(stateValue)) {
+        returnValues = stateValue.map(item => {
+          return { id: item, name: `${item} (0)` }
+        })
+      }
+    }
+    return returnValues
   }
 
   // ---------------------------------------------------------------------------

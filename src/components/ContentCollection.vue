@@ -163,34 +163,16 @@ export default {
       this.resultsLoading = false
     },
     updatePropertiesBasedOnSearchResponse (response) {
-      if (this.exposedFilterFormData && response.aggregations) {
-        this.updateExposedFilterFormAggregations(response.aggregations)
-      }
       this.results = response.hits
       this.resultCount = this.dataManager.getProcessedResultsCount(this.state, response.total)
+      if (this.exposedFilterFormData && response.aggregations) {
+        this.dataManager.updateFiltersFromAggregation(response.aggregations, this.exposedFilterFormData, this.state, (field, isDisabled) => {
+          Vue.set(field, 'disabled', isDisabled)
+        })
+      }
       if (this.paginationData) {
         this.paginationData.totalSteps = this.dataManager.getPaginationTotalSteps(this.state, response.total)
       }
-    },
-    updateExposedFilterFormAggregations (responseAggregations) {
-      // TODO - Some of this needs to be in the CC class, some here.
-      Object.keys(responseAggregations).forEach(model => {
-        this.exposedFilterFormData.schema.groups.forEach(group => {
-          group.fields.forEach(field => {
-            if (field.model === model) {
-              const buckets = responseAggregations[model].buckets
-              if (buckets.length > 0) {
-                field.values = buckets.map(({ key, doc_count: count }) => ({ id: key, name: `${key} (${count})` }))
-                Vue.set(field, 'disabled', false)
-              } else {
-                this.state[model] = this.defaultState[model]
-                field.values = this.state[model]
-                Vue.set(field, 'disabled', true)
-              }
-            }
-          })
-        })
-      })
     },
     syncTo (from, to, allowed) {
       return this.dataManager.syncObject(from, to, allowed)
@@ -222,7 +204,7 @@ export default {
       this.$router.replace({ query })
     },
     syncQueryState (query) {
-      this.syncTo(query, this.state)
+      this.syncTo(this.dataManager.getTypeCorrectedQuery(query, this.defaultState), this.state)
       if (this.exposedFilterFormData) {
         this.syncTo(this.state, this.exposedFilterFormData.model, this.exposedFilterModels)
       }
