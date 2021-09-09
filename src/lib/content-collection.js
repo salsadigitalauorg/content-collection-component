@@ -147,8 +147,8 @@ module.exports = class ContentCollection {
     return returnQuery
   }
 
-  getURLSafeString (str) {
-    return str.toString()
+  getIdName (value) {
+    return value.toString()
   }
 
   getDefault (key) {
@@ -740,7 +740,7 @@ module.exports = class ContentCollection {
     if (field) {
       returnValues = field.values.map(item => {
         return {
-          id: this.getURLSafeString(item.name),
+          id: this.getIdName(item.name),
           name: item.name,
           value: item.value
         }
