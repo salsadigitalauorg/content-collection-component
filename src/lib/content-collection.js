@@ -134,6 +134,10 @@ module.exports = class ContentCollection {
     return returnState
   }
 
+  getURLSafeString (str) {
+    return str.toString()
+  }
+
   getDefault (key) {
     return this.defaults[key]
   }
@@ -672,7 +676,6 @@ module.exports = class ContentCollection {
   // ---------------------------------------------------------------------------
   // Exposed Control Methods
   // ---------------------------------------------------------------------------
-
   getExposedControlModelNames () {
     return this.getExposedControlFields().map(control => control.model)
   }
@@ -724,7 +727,7 @@ module.exports = class ContentCollection {
     if (field) {
       returnValues = field.values.map(item => {
         return {
-          id: item.name.toString(), // TODO - Consider using a URI friendly name?
+          id: this.getURLSafeString(item.name),
           name: item.name,
           value: item.value
         }

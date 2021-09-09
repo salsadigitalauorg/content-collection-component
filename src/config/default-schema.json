@@ -69,8 +69,8 @@
       "options": {
         "resultsCountText": "Displaying {range} of {count} results",
         "loadingText": "Loading",
-        "noResultsText": "Sorry! We couldn\"t find any matches",
-        "errorText": "Search isn\"t working right now, please try again later.",
+        "noResultsText": "Sorry! We couldn't find any matches",
+        "errorText": "Search isn't working right now, please try again later.",
         "sort": {
           "type": "field",
           "values": [
