@@ -218,9 +218,7 @@ export default {
       this.updateQuery()
     },
     updateQuery () {
-      const query = {}
-      // TODO - Take into account the default state.
-      this.syncTo(this.state, query)
+      const query = this.dataManager.getDiffObject(this.state, this.defaultState)
       this.$router.replace({ query })
     },
     syncQueryState (query) {

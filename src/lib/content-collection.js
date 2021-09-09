@@ -94,14 +94,18 @@ module.exports = class ContentCollection {
     return JSON.parse(JSON.stringify(obj))
   }
 
-  stripEmptyArray (obj) {
+  stripEmptyValues (obj) {
     Object.keys(obj).forEach(key => {
-      if (Array.isArray(obj[key])) {
+      if (obj[key] === null) {
+        delete obj[key]
+      } else if (obj[key] === '') {
+        delete obj[key]
+      } else if (Array.isArray(obj[key])) {
         if (obj[key].length === 0) {
           delete obj[key]
         }
       } else if (typeof obj[key] === 'object') {
-        this.stripEmptyArray(obj[key])
+        this.stripEmptyValues(obj[key])
       }
     })
   }
@@ -117,6 +121,17 @@ module.exports = class ContentCollection {
         to[key] = this.getNewValue(from[key])
       }
     })
+  }
+
+  getDiffObject (state, standard) {
+    const returnState = {}
+    Object.keys(state).forEach(key => {
+      if (state[key] !== standard[key]) {
+        returnState[key] = state[key]
+      }
+    })
+    this.stripEmptyValues(returnState)
+    return returnState
   }
 
   getDefault (key) {
@@ -345,7 +360,7 @@ module.exports = class ContentCollection {
       body.sort = sortFilters
     }
 
-    this.stripEmptyArray(body)
+    this.stripEmptyValues(body)
 
     return body
   }
