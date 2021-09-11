@@ -847,19 +847,17 @@ module.exports = class ContentCollection {
   // Search Query Methods
   // ---------------------------------------------------------------------------
   async getResults (state) {
-    const esRequest = {
-      from: this.getStartingItem(state),
-      size: this.getItemsToLoad(state),
-      _source: [],
-      ...this.getDSL(state)
-    }
+    let returnResults = null
+    const esRequest = this.getSearchRequest(state)
     const results = await this.searchClient(esRequest)
-    // TODO - Add some hardening around this to prevent errors.
-    return {
-      hits: results.hits.hits.map(this.mapResult.bind(this)),
-      total: results.hits.total,
-      aggregations: results.aggregations
+    if (results) {
+      returnResults = {
+        hits: results.hits.hits.map(this.mapResult.bind(this)),
+        total: results.hits.total,
+        aggregations: results.aggregations
+      }
     }
+    return returnResults
   }
 
   // ---------------------------------------------------------------------------
@@ -926,6 +924,15 @@ module.exports = class ContentCollection {
   // ---------------------------------------------------------------------------
   // Search Result Data Methods
   // ---------------------------------------------------------------------------
+  getSearchRequest (state) {
+    return {
+      from: this.getStartingItem(state),
+      size: this.getItemsToLoad(state),
+      _source: [],
+      ...this.getDSL(state)
+    }
+  }
+
   getInitialControlValue (internal, display, displayValues) {
     let returnValue = internal
     if (display) {

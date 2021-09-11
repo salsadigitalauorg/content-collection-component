@@ -20,7 +20,7 @@
     <!-- Search Results -->
     <rpl-search-results-layout
       :searchResults="results"
-      :errorMsg="errorText"
+      :error="error"
       :noResultsMsg="noResultsText"
       :loading="resultsLoading"
     >
@@ -109,6 +109,7 @@ export default {
       resultTotal: null,
       resultCount: null,
       resultsLoading: false,
+      error: null,
       exposedFilterFormData: dataManager.getExposedFilterForm(),
       exposedControlFormData: dataManager.getExposedControlForm(),
       exposedControlModels: dataManager.getExposedControlModelNames(),
@@ -159,7 +160,12 @@ export default {
     async getResults () {
       this.resultsLoading = true
       const response = await this.dataManager.getResults(this.state)
-      this.updateInterfaceFromSearchResponse(response)
+      if (response) {
+        this.error = null
+        this.updateInterfaceFromSearchResponse(response)
+      } else {
+        this.error = { message: this.errorText }
+      }
       this.resultsLoading = false
     },
     updateInterfaceFromSearchResponse (response) {
