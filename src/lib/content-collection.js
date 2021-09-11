@@ -848,8 +848,8 @@ module.exports = class ContentCollection {
   // ---------------------------------------------------------------------------
   async getResults (state) {
     let returnResults = null
-    const esRequest = this.getSearchRequest(state)
-    const results = await this.searchClient(esRequest)
+    const request = this.getSearchRequest(state)
+    const results = await this.searchClient(request)
     if (results) {
       returnResults = {
         hits: results.hits.hits.map(this.mapResult.bind(this)),
