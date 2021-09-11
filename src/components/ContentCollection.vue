@@ -60,6 +60,7 @@
         </rpl-col>
       </template>
     </rpl-search-results-layout>
+    <div class="rpl-visually-hidden" aria-live="polite">{{ announcerText }}</div>
   </div>
 </template>
 
@@ -110,6 +111,7 @@ export default {
       resultCount: null,
       resultsLoading: false,
       error: null,
+      announcerText: '',
       exposedFilterFormData: dataManager.getExposedFilterForm(),
       exposedControlFormData: dataManager.getExposedControlForm(),
       exposedControlModels: dataManager.getExposedControlModelNames(),
@@ -159,12 +161,15 @@ export default {
     },
     async getResults () {
       this.resultsLoading = true
+      this.announcerText = ''
       const response = await this.dataManager.getResults(this.state)
       if (response) {
         this.error = null
         this.updateInterfaceFromSearchResponse(response)
+        this.announcerText = response.total > 0 ? this.resultCount : this.noResultsText
       } else {
         this.error = { message: this.errorText }
+        this.announcerText = this.errorText
       }
       this.resultsLoading = false
     },
