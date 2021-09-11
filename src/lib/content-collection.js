@@ -986,11 +986,14 @@ module.exports = class ContentCollection {
   }
 
   getProcessedResultsCount (state, count) {
-    let text = this.getDisplayResultCountText()
-    if (text) {
-      const range = this.getResultCountRange(state, count)
-      text = text.replace('{range}', range)
-      text = text.replace('{count}', count)
+    let text = null
+    if (count > 0) {
+      text = this.getDisplayResultCountText()
+      if (text) {
+        const range = this.getResultCountRange(state, count)
+        text = text.replace('{range}', range)
+        text = text.replace('{count}', count)
+      }
     }
     return text
   }
