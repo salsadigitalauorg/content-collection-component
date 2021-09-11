@@ -34,7 +34,9 @@ module.exports = class ContentCollection {
       DisplayResultComponentCardStyle: 'noImage',
       DisplayResultComponentColumns: cardColsSetting,
       DisplayPaginationComponentColumns: cardColsSetting,
-      ItemsToLoad: 10
+      ItemsToLoad: 10,
+      scrollToResults: true,
+      scrollToResultsOffsetHeight: 102
     }
     if (!this.searchClient) {
       throw Error('Content Collection Error: A search client function is required.')
@@ -279,6 +281,14 @@ module.exports = class ContentCollection {
       }
     }
     return returnPagination
+  }
+
+  getScrollToResults () {
+    return this.getDefault('scrollToResults')
+  }
+
+  getScrollToResultsOffsetHeight () {
+    return this.getDefault('scrollToResultsOffsetHeight')
   }
 
   // ---------------------------------------------------------------------------

@@ -19,6 +19,7 @@
     <rpl-divider v-if="exposedFilterFormData" />
     <!-- Search Results -->
     <rpl-search-results-layout
+      ref="search-results"
       :searchResults="results"
       :error="error"
       :noResultsMsg="noResultsText"
@@ -112,6 +113,8 @@ export default {
       resultsLoading: false,
       error: null,
       announcerText: '',
+      scrollOnPaginationChange: false,
+      scrollOffset: dataManager.getScrollToResultsOffsetHeight(),
       exposedFilterFormData: dataManager.getExposedFilterForm(),
       exposedControlFormData: dataManager.getExposedControlForm(),
       exposedControlModels: dataManager.getExposedControlModelNames(),
@@ -172,6 +175,23 @@ export default {
         this.announcerText = this.errorText
       }
       this.resultsLoading = false
+      this.moveToTopOfResults()
+    },
+    moveToTopOfResults () {
+      if (this.scrollOnPaginationChange) {
+        const scrollToEl = this.$refs['search-results']?.$el
+        if (scrollToEl) {
+          this.$nextTick(() => {
+            window.scrollTo({
+              top: (scrollToEl.offsetTop - this.scrollOffset)
+            })
+            const firstLinkEl = scrollToEl.querySelector('a')
+            if (firstLinkEl) {
+              firstLinkEl.focus()
+            }
+          })
+        }
+      }
     },
     updateInterfaceFromSearchResponse (response) {
       this.results = response.hits
@@ -228,6 +248,9 @@ export default {
         this.syncTo(this.state, this.exposedControlFormData.model, this.exposedControlModels)
       }
       this.setPaginationFromState()
+    },
+    initializeScrollOnPageChange () {
+      this.scrollOnPaginationChange = this.dataManager.getScrollToResults()
     }
   },
   watch: {
@@ -242,11 +265,12 @@ export default {
     }
     if (this.preloadSearchResponse) {
       this.updateInterfaceFromSearchResponse(this.preloadSearchResponse)
+      this.initializeScrollOnPageChange()
     }
   },
   mounted () {
     if (!this.preloadSearchResponse) {
-      this.getResults()
+      this.getResults().then(this.initializeScrollOnPageChange.bind(this))
     }
   }
 }
