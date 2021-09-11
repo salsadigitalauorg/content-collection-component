@@ -61,7 +61,7 @@
         </rpl-col>
       </template>
     </rpl-search-results-layout>
-    <div class="rpl-visually-hidden" aria-live="polite">{{ announcerText }}</div>
+    <div v-if="isInteractive" class="rpl-visually-hidden" aria-live="polite">{{ announcerText }}</div>
   </div>
 </template>
 
@@ -156,6 +156,9 @@ export default {
     },
     paginationModelName () {
       return this.dataManager.getPaginationModelName()
+    },
+    isInteractive () {
+      return (!!this.exposedFilterFormData || !!this.exposedControlFormData || !!this.paginationData)
     }
   },
   methods: {

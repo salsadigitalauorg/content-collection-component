@@ -34,7 +34,7 @@ module.exports = class ContentCollection {
       DisplayResultComponentCardStyle: 'noImage',
       DisplayResultComponentColumns: cardColsSetting,
       DisplayPaginationComponentColumns: cardColsSetting,
-      ItemsToLoad: 10,
+      ItemsToLoad: 12,
       scrollToResults: true,
       scrollToResultsOffsetHeight: 102
     }
@@ -985,8 +985,8 @@ module.exports = class ContentCollection {
   getResultCountRange (state, count) {
     let returnCountRange = false
     if (count && count > 0) {
-      const initialStep = state[this.getPaginationModelName()]
-      const itemsPerPage = state[this.getItemsPerPageModelName()]
+      const initialStep = state[this.getPaginationModelName()] || 1
+      const itemsPerPage = this.getItemsToLoad(state)
       const from = initialStep < 2 ? 1 : (itemsPerPage * (initialStep - 1)) + 1
       const byPage = itemsPerPage * initialStep
       const total = (byPage > count) ? count : byPage
