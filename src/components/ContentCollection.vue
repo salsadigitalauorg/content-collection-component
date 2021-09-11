@@ -113,6 +113,7 @@ export default {
       resultsLoading: false,
       error: null,
       announcerText: '',
+      scrollOnNextLoad: false,
       scrollOnPaginationChange: false,
       scrollOffset: dataManager.getScrollToResultsOffsetHeight(),
       exposedFilterFormData: dataManager.getExposedFilterForm(),
@@ -178,7 +179,10 @@ export default {
         this.announcerText = this.errorText
       }
       this.resultsLoading = false
-      this.moveToTopOfResults()
+      if (this.scrollOnNextLoad) {
+        this.scrollOnNextLoad = false
+        this.moveToTopOfResults()
+      }
     },
     moveToTopOfResults () {
       if (this.scrollOnPaginationChange) {
@@ -220,6 +224,7 @@ export default {
       }
     },
     paginationChange (value) {
+      this.scrollOnNextLoad = true
       this.syncTo({ page: value }, this.state)
       this.updateQuery()
     },
