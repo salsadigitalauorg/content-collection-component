@@ -75,7 +75,6 @@ import RplPagination from '@dpc-sdp/ripple-pagination'
 import { RplSearchResultsLayout, RplSearchResult } from '@dpc-sdp/ripple-search'
 import { RplCardPromo } from '@dpc-sdp/ripple-card'
 import { RplDivider } from '@dpc-sdp/ripple-global'
-// TODO - We need to figure out how custom result components can be loaded.
 
 export default {
   name: 'AppContentCollection',
@@ -114,7 +113,8 @@ export default {
       exposedControlFormData: dataManager.getExposedControlForm(),
       exposedControlModels: dataManager.getExposedControlModelNames(),
       exposedFilterModels: dataManager.getExposedFilterModelNames(),
-      paginationData: dataManager.getDisplayPaginationData()
+      paginationData: dataManager.getDisplayPaginationData(),
+      useRouter: dataManager.getKeepState()
     }
   },
   computed: {
@@ -159,10 +159,10 @@ export default {
     async getResults () {
       this.resultsLoading = true
       const response = await this.dataManager.getResults(this.state)
-      this.updatePropertiesBasedOnSearchResponse(response)
+      this.updateInterfaceFromSearchResponse(response)
       this.resultsLoading = false
     },
-    updatePropertiesBasedOnSearchResponse (response) {
+    updateInterfaceFromSearchResponse (response) {
       this.results = response.hits
       this.resultCount = this.dataManager.getProcessedResultsCount(this.state, response.total)
       if (this.exposedFilterFormData && response.aggregations) {
@@ -201,7 +201,12 @@ export default {
     },
     updateQuery () {
       const query = this.dataManager.getDiffObject(this.state, this.defaultState)
-      this.$router.replace({ query })
+      if (this.useRouter) {
+        this.$router.replace({ query })
+      } else {
+        this.syncQueryState(query)
+        this.getResults()
+      }
     },
     syncQueryState (query) {
       this.syncTo(this.dataManager.getTypeCorrectedQuery(query, this.defaultState), this.state)
@@ -221,9 +226,11 @@ export default {
     }
   },
   created () {
-    this.syncQueryState(this.$route.query)
+    if (this.useRouter) {
+      this.syncQueryState(this.$route.query)
+    }
     if (this.preloadSearchResponse) {
-      this.updatePropertiesBasedOnSearchResponse(this.preloadSearchResponse)
+      this.updateInterfaceFromSearchResponse(this.preloadSearchResponse)
     }
   },
   mounted () {

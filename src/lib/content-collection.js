@@ -222,6 +222,10 @@ module.exports = class ContentCollection {
     return this.config?.interface?.display?.options?.pagination
   }
 
+  getKeepState () {
+    return this.config?.interface?.keepState
+  }
+
   // ---------------------------------------------------------------------------
   // Additional Getter Methods
   // ---------------------------------------------------------------------------
