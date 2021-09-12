@@ -1,5 +1,5 @@
 const moment = require('dayjs')
-// import { cardColsSetting } from '@dpc-sdp/ripple-nuxt-tide/lib/config/layout.config.js'
+// const { cardColsSetting } = require('@dpc-sdp/ripple-nuxt-tide/lib/config/layout.config.js')
 const cardColsSetting = require('./layout.config.js')
 
 /**
@@ -36,7 +36,8 @@ module.exports = class ContentCollection {
       DisplayPaginationComponentColumns: cardColsSetting,
       ItemsToLoad: 12,
       scrollToResults: true,
-      scrollToResultsOffsetHeight: 102
+      scrollToResultsOffsetHeight: 102,
+      pageChangeFocusSelector: 'a'
     }
     if (!this.searchClient) {
       throw Error('Content Collection Error: A search client function is required.')
@@ -289,6 +290,10 @@ module.exports = class ContentCollection {
 
   getScrollToResultsOffsetHeight () {
     return this.getDefault('scrollToResultsOffsetHeight')
+  }
+
+  pageChangeFocusSelector () {
+    return this.getDefault('pageChangeFocusSelector')
   }
 
   // ---------------------------------------------------------------------------
@@ -726,8 +731,7 @@ module.exports = class ContentCollection {
     })
 
     if (fields.length > 0) {
-      // TODO - Health Specific - you can move this into the HealthContentCollection
-      // and remove from here when forms gets auto-submit support.
+      // TODO - this to be optional when forms gets auto-submit support.
       fields.push({
         type: 'rplsubmitloader',
         buttonText: 'Go',
