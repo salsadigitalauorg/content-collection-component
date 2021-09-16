@@ -9,9 +9,6 @@ export default class HealthContentCollection extends ContentCollection {
       case 'vh-search-result':
         returnName = 'vh-search-result'
         break
-      case 'search-result':
-        returnName = 'rpl-search-result'
-        break
       default:
         returnName = super.getDisplayResultComponentName()
         break
@@ -27,14 +24,6 @@ export default class HealthContentCollection extends ContentCollection {
     switch (this.getDisplayResultComponentType()) {
       case 'vh-search-result':
         mappedResult = this.vhSearchResultMapping(item, link)
-        break
-      case 'search-result':
-        mappedResult = {
-          title: _source.title?.[0],
-          link: { linkText: link, linkUrl: link },
-          date: _source.created?.[0],
-          description: _source.field_landing_page_summary?.[0]
-        }
         break
       default:
         mappedResult = super.mapResult(item)
