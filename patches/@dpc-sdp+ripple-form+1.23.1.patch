@@ -1,3 +1,16 @@
+diff --git a/node_modules/@dpc-sdp/ripple-form/Select.vue b/node_modules/@dpc-sdp/ripple-form/Select.vue
+index 467e169..75e3182 100644
+--- a/node_modules/@dpc-sdp/ripple-form/Select.vue
++++ b/node_modules/@dpc-sdp/ripple-form/Select.vue
+@@ -376,7 +376,7 @@ $rpl-select-checkbox-margin: 0 !default;
+     outline: 0;
+     position: absolute;
+     top: -1px;
+-    z-index: 1;
++    z-index: 2;
+     background: $rpl-form-element-bg-color;
+     left: -1px;
+     width: 100%;
 diff --git a/node_modules/@dpc-sdp/ripple-form/index.vue b/node_modules/@dpc-sdp/ripple-form/index.vue
 index c2ec90e..bdc903a 100644
 --- a/node_modules/@dpc-sdp/ripple-form/index.vue
