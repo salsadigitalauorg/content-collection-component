@@ -69,4 +69,35 @@ export default class HealthContentCollection extends ContentCollection {
     }
     return returnValue
   }
+
+  getExposedFilterField (schemaField) {
+    let returnFilterField = null
+    switch (schemaField.type) {
+      case 'a-z':
+        const field = this.cloneObject(schemaField.options)
+        field.values = ["a","b","c","d","e","f","g","h","i","j","k","l","m","n","o","p","q","r","s","t","u","v","w","x","y","z"]
+        field.styleClasses = schemaField.additionalClasses
+        returnFilterField = field
+        break
+      default:
+        returnFilterField = super.getExposedFilterField(schemaField)
+        break
+    }
+    return returnFilterField
+  }
+
+  getSimpleDSLExposedAdvancedFiltersField (field, esField, stateValue) {
+    let returnESField = null
+    switch (field.type) {
+      case 'a-z':
+        if (stateValue) {
+          returnESField = { filter: { 'prefix': { [esField]: stateValue } } }
+        }
+        break
+      default:
+        returnESField = super.getSimpleDSLExposedAdvancedFiltersField(field, esField, stateValue)
+        break
+    }
+    return returnESField
+  }
 }
