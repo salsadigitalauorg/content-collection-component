@@ -4,18 +4,18 @@
       <div class="controls__inner">
         <div class="controls__left">
           <label>
-            <span>elasticsearch:</span>
-            <textarea v-model="customES"></textarea>
+            <span>Elasticsearch config:</span>
+            <prism-editor class="code-editor" v-model="customES" :highlight="highlighter" line-numbers></prism-editor>
           </label>
           <label>
-            <span>Environment:</span>
-            <textarea v-model="customEnvironment"></textarea>
+            <span>Environment config:</span>
+            <prism-editor class="code-editor" v-model="customEnvironment" :highlight="highlighter" line-numbers></prism-editor>
           </label>
         </div>
         <div class="controls__right">
           <label>
-            <span>Schema:</span>
-            <textarea v-model="customSchema"></textarea>
+            <span>Schema config:</span>
+            <prism-editor class="code-editor" v-model="customSchema" :highlight="highlighter" line-numbers></prism-editor>
           </label>
         </div>
       </div>
@@ -28,6 +28,13 @@
 </template>
 
 <script>
+import { PrismEditor } from 'vue-prism-editor'
+import 'vue-prism-editor/dist/prismeditor.min.css'
+import { highlight, languages } from 'prismjs/components/prism-core'
+import 'prismjs/components/prism-clike'
+import 'prismjs/components/prism-json'
+import 'prismjs/themes/prism-coy.css'
+
 import ContentCollection from '../components/ContentCollection.vue'
 import defaultSchema from '../config/default-schema.json'
 import defaultEnvironment from '../config/default-environment.json'
@@ -36,6 +43,7 @@ import defaultES from '../config/default-es.json'
 export default {
   name: 'App',
   components: {
+    PrismEditor,
     ContentCollection
   },
   data () {
@@ -63,6 +71,9 @@ export default {
         this.schema = schema
       }
       this.count++
+    },
+    highlighter(code) {
+      return highlight(code, languages.json); // returns html
     }
   },
   mounted () {
@@ -91,21 +102,25 @@ export default {
     }
   }
 
-  textarea {
+  .code-editor {
+    background: white;
+    font-family: monospace;
+    font-size: 12px;
+    line-height: 1.4em;
     box-sizing: border-box;
     width: 100%;
-    font-family: monospace;
   }
 
   &__left {
-    textarea {
+    .code-editor {
       height: 150px;
     }
   }
 
   &__right {
-    textarea {
-      height: 325px;
+    padding-left: 2px;
+    .code-editor {
+      height: 324px;
     }
   }
 }

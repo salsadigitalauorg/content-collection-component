@@ -21,7 +21,9 @@
     "dayjs": "^1.10.6",
     "elasticsearch": "^16.7.2",
     "patch-package": "^6.4.7",
+    "prismjs": "^1.25.0",
     "vue": "^2.6.11",
+    "vue-prism-editor": "^1.2.2",
     "vue-router": "^3.2.0"
   },
   "devDependencies": {
