@@ -20,6 +20,17 @@
         </div>
       </div>
       <button @click="updateSchema">Update Schema</button>
+      <button
+        class="controls__show-schema"
+        :class="{ 'controls__show-schema--expanded': viewSchema}"
+        @click="viewSchema = !viewSchema"
+      >{{ viewSchema ? 'hide' : 'show' }} schema</button>
+      <div  v-if="viewSchema">
+        <label>
+          <span>Reference:</span>
+          <prism-editor class="code-editor" v-model="validationSchema" :highlight="highlighter" line-numbers :readonly="true"></prism-editor>
+        </label>
+      </div>
     </div>
     <div class="display">
       <content-collection v-if="schema" :schema="schema" :environment="environment" :key="count"/>
@@ -40,6 +51,10 @@ import defaultSchema from '../config/default-schema.json'
 import defaultEnvironment from '../config/default-environment.json'
 import defaultES from '../config/default-es.json'
 
+const Ajv = require("ajv")
+const ajv = new Ajv({ allErrors: true })
+import validationSchema from '../validation/schema.json'
+
 export default {
   name: 'App',
   components: {
@@ -51,9 +66,11 @@ export default {
       customES: JSON.stringify(defaultES, null, 2),
       customEnvironment: JSON.stringify(defaultEnvironment, null, 2),
       customSchema: JSON.stringify(defaultSchema, null, 2),
+      validationSchema: JSON.stringify(validationSchema, null, 2),
       environment: null,
       schema: null,
-      count: 0
+      count: 0,
+      viewSchema: false
     }
   },
   methods: {
@@ -66,14 +83,34 @@ export default {
       if (environment) {
         this.environment = environment
       }
-      const schema = JSON.parse(this.customSchema)
-      if (schema) {
-        this.schema = schema
+
+      try {
+        const schema = JSON.parse(this.customSchema)
+        const validate = ajv.compile(validationSchema)
+        const isValid = validate(schema)
+        if (isValid) {
+          this.schema = schema
+          this.count++
+        } else {
+          this.printError(validate.errors)
+        }
+      } catch (e) {
+        alert(e)
       }
-      this.count++
     },
     highlighter(code) {
       return highlight(code, languages.json); // returns html
+    },
+    printError(errors) {
+      console.log(errors)
+      const errorMsg = errors.map(e => {
+        const path = e.instancePath || 'root'
+        const sPath = e.schemaPath
+        const msg = e.message
+        const params = Object.keys(e.params).map(key => `${key}: ${e.params[key]}`)
+        return `${path} -> ${sPath}:\n\t${msg}\n\t\t${params}`
+      }).join('\n')
+      alert(errorMsg)
     }
   },
   mounted () {
@@ -86,6 +123,23 @@ export default {
 .controls {
   background-color: lightgrey;
   padding: 22px;
+
+  &__show-schema {
+    float: right;
+    background-color: transparent;
+    border: 0;
+    text-decoration: underline;
+
+    &::after {
+      content: ' ↓'
+    }
+
+    &--expanded {
+      &::after {
+        content: ' ↑'
+      }
+    }
+  }
 
   &__inner {
     @media screen and (min-width: 768px) {
