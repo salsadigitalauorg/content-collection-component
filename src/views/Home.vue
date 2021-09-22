@@ -19,12 +19,12 @@
           </label>
         </div>
       </div>
-      <button @click="updateSchema">Update Schema</button>
+      <button @click="updateSchema">Apply configuration</button>
       <button
         class="controls__show-schema"
         :class="{ 'controls__show-schema--expanded': viewSchema}"
         @click="viewSchema = !viewSchema"
-      >{{ viewSchema ? 'hide' : 'show' }} schema</button>
+      >{{ viewSchema ? 'hide' : 'show' }} reference schema</button>
       <div  v-if="viewSchema">
         <label>
           <span>Reference:</span>
