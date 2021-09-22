@@ -75,7 +75,7 @@ export default class HealthContentCollection extends ContentCollection {
     switch (schemaField.type) {
       case 'a-z':
         const field = this.cloneObject(schemaField.options)
-        field.values = ['a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v','w','x','y','z']
+        field.values = field.values || 'abcdefghijklmnopqrstuvwxyz'.split('')
         field.type = field.type || 'rploptionbutton'
         field.label = field.label || 'Starting Letter'
         field.styleClasses = schemaField.additionalClasses || 'app-content-collection__form-col-full'

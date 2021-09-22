@@ -473,8 +473,9 @@ module.exports = class ContentCollection {
   getSimpleDSLExposedAdvancedFiltersField (field, esField, stateValue) {
     let returnESField = null
     switch (field.type) {
-      case "basic":
-        let filter, agg = null
+      case 'basic':
+        let filter = null
+        let agg = null
         if (Array.isArray(stateValue)) {
           if (stateValue.length > 0) {
             filter = { 'terms': { [esField]: stateValue } }
