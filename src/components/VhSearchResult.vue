@@ -1,31 +1,34 @@
 <template>
   <div class="vh-search-result">
-    <rpl-link :href="link.linkUrl">
-      <h2 class="vh-search-result__heading">{{ title }}</h2>
-    </rpl-link>
-    <div class="vh-search-result__sub-top">{{ subTop }}</div>
-    <div class="vh-search-result__summary" v-html="summary"></div>
-    <div class="vh-search-result__sub-bottom">{{ subBottom }}</div>
+    <div class="vh-search-result__title-bar">
+      <rpl-icon v-if="icon" class="vh-search-result__title-icon" :symbol="icon" color="primary" />
+      <rpl-link class="vh-search-result__link" v-if="title" :href="link.linkUrl">
+        <h2 class="vh-search-result__heading">{{ title }}</h2>
+      </rpl-link>
+    </div>
+    <div v-if="subTop" class="vh-search-result__sub-top">{{ subTop }}</div>
+    <div v-if="summary" class="vh-search-result__summary" v-html="summary"></div>
+    <div v-if="subBottom" class="vh-search-result__sub-bottom">{{ subBottom }}</div>
   </div>
 </template>
 
 <script>
 import RplLink from '@dpc-sdp/ripple-link'
+import { RplIcon } from '@dpc-sdp/ripple-icon'
 
 export default {
   name: 'VhSearchResult',
   props: {
+    icon: String,
     title: String,
     link: Object,
-    date: String,
-    summary: String,
-    tags: Array,
-    icon: String,
     subTop: String,
+    summary: String,
     subBottom: String
   },
   components: {
-    RplLink
+    RplLink,
+    RplIcon
   }
 }
 </script>
@@ -34,8 +37,6 @@ export default {
   @import "~@dpc-sdp/ripple-global/scss/settings";
   @import "~@dpc-sdp/ripple-global/scss/tools";
 
-  $vh-search-result-link-ruleset: ('s', 1.25em, 'medium') !default;
-  $vh-search-result-link-text-color: rpl-color('primary') !default;
   $vh-search-result-heading-text-color: rpl-color('primary') !default;
   $vh-search-result-summary-text-color: rpl-color('extra_dark_neutral') !default;
   $vh-search-result-sub-bottom-text-color: rpl-color('secondary') !default;
@@ -49,27 +50,31 @@ export default {
     's': ('s', 1.5em, 'regular')
   ) !default;
   $vh-search-result-sub-bottom-ruleset: (
-    'xs': ('xs', 1em, 'regular'),
-    's': ('xs', 1.2em, 'regular')
+    'xs': ('xs', 1em, 'medium'),
+    's': ('xs', 1.2em, 'medium')
   ) !default;
 
   .vh-search-result {
     padding-bottom: $rpl-space-4;
 
-    @include rpl_breakpoint('m') {
-      padding-bottom: $rpl-space-4 * 2;
+    &__title-bar {
+      display: flex;
+      margin-bottom: $rpl-space-4;
+    }
+
+    &__title-icon {
+      margin-right: $rpl-space-3;
     }
 
     &__heading {
       @include rpl_typography_ruleset($vh-search-result-heading-ruleset);
       color: $vh-search-result-heading-text-color;
       max-width: $rpl-content-max-width;
-      margin: $rpl-space-4 0;
+      margin: 0;
     }
 
     &__link {
-      @include rpl_typography_ruleset($vh-search-result-link-ruleset);
-      color: $vh-search-result-link-text-color;
+      color: $vh-search-result-heading-text-color;
       word-wrap: break-word;
     }
 
