@@ -74,7 +74,6 @@ export default class HealthContentCollection extends ContentCollection {
     switch (schemaField.type) {
       case 'a-z':
         const field = this.cloneObject(schemaField.options)
-        field.values = field.values || 'abcdefghijklmnopqrstuvwxyz'.split('')
         field.type = field.type || 'rploptionbutton'
         field.label = field.label || 'Starting Letter'
         field.styleClasses = schemaField.additionalClasses || 'app-content-collection__form-col-full'
@@ -92,7 +91,7 @@ export default class HealthContentCollection extends ContentCollection {
     switch (field.type) {
       case 'a-z':
         if (stateValue) {
-          returnESField = { filter: { 'prefix': { [esField]: stateValue } } }
+          returnESField = { filter: { 'prefix': { [esField]: stateValue.toLowerCase() } } }
         }
         break
       default:
