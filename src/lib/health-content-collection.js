@@ -2,7 +2,6 @@ import ContentCollection from './content-collection.js'
 const moment = require('dayjs')
 
 export default class HealthContentCollection extends ContentCollection {
-
   getDisplayResultComponentName () {
     let returnName = null
     switch (this.getDisplayResultComponentType()) {
