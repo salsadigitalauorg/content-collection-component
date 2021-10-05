@@ -181,6 +181,10 @@
           "type": "boolean",
           "description": "Store the state of the user interactions in the URL. Only one Content Collection can use this per page."
         },
+        "skipToResultLink": {
+          "type": "boolean",
+          "description": "Show skip to result link when accessing using a tab key, default is true."
+        },
         "keyword": {
           "type": "object",
           "properties": {

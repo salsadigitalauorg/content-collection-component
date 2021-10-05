@@ -239,6 +239,18 @@ module.exports = class ContentCollection {
     return this.config?.interface?.keepState
   }
 
+  getSkipToResultLink () {
+    const skipToResultLink = this.config?.interface?.skipToResultLink
+    const hasFilters = this.config?.interface?.keyword || this.config?.interface?.filters
+    const showSkipLink = skipToResultLink !== undefined ? skipToResultLink : true
+    return showSkipLink && hasFilters
+  }
+
+  getSkipToResultLinkID () {
+    const skipToResultLinkID = this.envConfig?.skipToResultLinkID
+    return skipToResultLinkID !== undefined ? skipToResultLinkID : 'content-collection-results'
+  }
+
   // ---------------------------------------------------------------------------
   // Additional Getter Methods
   // ---------------------------------------------------------------------------

@@ -2,6 +2,7 @@
   "title": "Content Collection",
   "interface": {
     "keepState": true,
+    "skipToResultLink": true,
     "keyword": {
       "type": "basic",
       "label": "Search by keyword",

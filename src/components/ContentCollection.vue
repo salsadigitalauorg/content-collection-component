@@ -5,6 +5,9 @@
       <div class="app-content-collection__header-left">
         <h2 v-if="title" class="app-content-collection__heading">{{ title }}</h2>
         <p v-if="description">{{ description }}</p>
+        <div class="app-content-collection__skip-link rpl-skip-link ">
+          <a v-if="showSkipToResultLink" class="app-content-collection__skip-link__link rpl-skip-link__link" :href="getSkipToResultLinkAnchor">Skip to results</a>
+        </div>
       </div>
       <div class="app-content-collection__header-right">
         <rpl-link v-if="cta" :href="cta.url">{{ cta.text }}</rpl-link>
@@ -17,6 +20,7 @@
       :submitHandler="exposedFilterFormSubmit"
     />
     <rpl-divider v-if="exposedFilterFormData" />
+    <div v-if="showSkipToResultLink" :id="getSkipToResultLinkID"></div>
     <!-- Search Results -->
     <rpl-search-results-layout
       ref="search-results"
@@ -161,6 +165,15 @@ export default {
     },
     isInteractive () {
       return (!!this.exposedFilterFormData || !!this.exposedControlFormData || !!this.paginationData)
+    },
+    showSkipToResultLink () {
+      return this.dataManager.getSkipToResultLink()
+    },
+    getSkipToResultLinkID () {
+      return this.dataManager.getSkipToResultLinkID()
+    },
+    getSkipToResultLinkAnchor () {
+      return '#' + this.dataManager.getSkipToResultLinkID()
     }
   },
   methods: {
@@ -296,6 +309,11 @@ $rpl-search-form-button-width: rem(28px) !default;
 $rpl-search-form-show-filters-ruleset: ('s', .87em, 'bold') !default;
 $rpl-search-form-search-button-text: $rpl-search-form-show-filters-ruleset !default;
 $rpl-search-form-search-button-text-color: rpl-color('primary') !default;
+$app-content-collection-link-padding: $rpl-space-4 ($rpl-space * 5) !default;
+$app-content-collection-link-text-color: rpl-color('white') !default;
+$app-content-collection-link-background: rpl-color('secondary') !default;
+$app-content-collection-link-ruleset: ('s', 1em, 'bold') !default;
+$app-content-collection-link-border-radius: 0 0 rem(4px) 0 !default;
 
 .app-content-collection {
   &__header {
@@ -334,6 +352,33 @@ $rpl-search-form-search-button-text-color: rpl-color('primary') !default;
     @include rpl_typography('heading_l');
     margin: 0;
     margin-bottom: $rpl-space * 5;
+  }
+
+  &__skip-link {
+    position: relative;
+
+    &__link {
+      @include rpl_visually_hidden;
+
+      &:focus {
+        @include rpl_typography_ruleset($app-content-collection-link-ruleset);
+        @include rpl_dropshadow;
+        background: $app-content-collection-link-background;
+        color: $app-content-collection-link-text-color;
+        z-index: $rpl-zindex-popover;
+        padding: $app-content-collection-link-padding;
+        border-radius: $app-content-collection-link-border-radius;
+        width: auto;
+        height: auto;
+        margin: auto;
+        clip: auto;
+        pointer-events: auto;
+        text-decoration: none;
+        top: 0;
+        left: 0;
+      }
+    }
+
   }
 
   &__search-result {
