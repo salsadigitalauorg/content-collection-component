@@ -88,9 +88,9 @@ module.exports = class ContentCollection {
     if (urls?.length > 0) {
       const cfg = this.envConfig
       if (cfg.siteId && cfg.domains) {
-        returnPath = this.getLocalDomainURL(urls, cfg.siteId, primarySiteId, cfg.domains).path
+        returnPath = this.getLocalDomainURL(urls, cfg.siteId, primarySiteId, cfg.domains)
       } else {
-        returnPath = urls[0]
+        returnPath = { domain: '', path: urls[0] }
       }
     }
     return returnPath
@@ -907,7 +907,7 @@ module.exports = class ContentCollection {
       case 'search-result':
         mappedResult = {
           title: _source.title?.[0],
-          link: { linkText: link, linkUrl: link },
+          link: link ? { linkText: link.domain + link.path, linkUrl: link.path } : null,
           date: _source.created?.[0],
           description: _source.field_landing_page_summary?.[0]
         }
@@ -917,7 +917,7 @@ module.exports = class ContentCollection {
         const style = this.getDisplayResultComponent()?.style
         mappedResult = {
           title: _source.title?.[0],
-          link: { text: link, url: link },
+          link: link ? { text: link.path, url: link.path } : null,
           dateStart: _source.created?.[0],
           summary: _source.field_landing_page_summary?.[0],
           image: _source.field_media_image_absolute_path?.[0],
