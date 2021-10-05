@@ -2,5 +2,6 @@
   "siteId": "4",
   "domains": { "4": "www.vic.gov.au" },
   "currentPage": "",
-  "sidebar": false
+  "sidebar": false,
+  "skipToResultLinkID": "go-here-please"
 }
