@@ -60,7 +60,7 @@
             "values": []
           },
           "additionalClasses": [ "app-content-collection__form-col-3" ],
-          "elasticsearch-field": "field_topic",
+          "elasticsearch-field": "field_topic_name",
           "elasticsearch-aggregation": true
         }
       ]
