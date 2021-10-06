@@ -488,9 +488,6 @@ $app-content-collection-link-border-radius: 0 0 rem(4px) 0 !default;
 
   // Search results layout
   .rpl-search-results-layout {
-    &__info {
-      @include rpl-typography-font('s', 1.2rem, 'medium');
-    }
     &__sort {
       .rpl-form {
         .form-group {
@@ -519,9 +516,18 @@ $app-content-collection-link-border-radius: 0 0 rem(4px) 0 !default;
           margin-right: 0;
         }
       }
+
+      .app-content-collection__form-wrap {
+        justify-content: flex-end;
+      }
     }
     &__header {
-      display: block;
+      flex-direction: row;
+      vertical-align: top;
+    }
+    &__info {
+      margin-top: $rpl-space-4;
+      align-self: start;
     }
   }
 
