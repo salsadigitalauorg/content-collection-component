@@ -321,12 +321,6 @@ module.exports = class ContentCollection {
     return this.getDefault('pageChangeFocusSelector')
   }
 
-  getExposedControlSubmitOnChange () {
-    const options = this.config?.interface?.display?.options
-    const submitValue = options ? options.controlSubmitOnChange : undefined
-    return submitValue !== undefined ? submitValue : true
-  }
-
   // ---------------------------------------------------------------------------
   // DSL Methods
   // ---------------------------------------------------------------------------
@@ -782,15 +776,6 @@ module.exports = class ContentCollection {
     })
 
     if (fields.length > 0) {
-      if (!this.getExposedControlSubmitOnChange()) {
-        fields.push({
-          type: 'rplsubmitloader',
-          buttonText: 'Go',
-          loading: false,
-          autoUpdate: true,
-          styleClasses: ['app-content-collection__form-inline']
-        })
-      }
       returnControlForm = {
         model,
         schema: {
@@ -890,9 +875,7 @@ module.exports = class ContentCollection {
         }
         break;
       case 'controlForm':
-        if (this.getExposedControlSubmitOnChange()) {
-          returnSubmitForm = true
-        }
+        returnSubmitForm = true
         break;
     }
     return returnSubmitForm
