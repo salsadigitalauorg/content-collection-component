@@ -185,6 +185,10 @@
           "type": "boolean",
           "description": "Show skip to result link when accessing using a tab key, default is true."
         },
+        "SkipToResultLinkLabel": {
+          "type": "string",
+          "description": "Default is `Skip to results`"
+        },
         "keyword": {
           "type": "object",
           "properties": {

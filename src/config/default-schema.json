@@ -3,6 +3,7 @@
   "interface": {
     "keepState": true,
     "skipToResultLink": true,
+    "SkipToResultLinkLabel": "Skip to results",
     "keyword": {
       "type": "basic",
       "label": "Search by keyword",
