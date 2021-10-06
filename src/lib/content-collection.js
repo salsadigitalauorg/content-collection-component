@@ -321,6 +321,12 @@ module.exports = class ContentCollection {
     return this.getDefault('pageChangeFocusSelector')
   }
 
+  getExposedControlSubmitOnChange () {
+    const options = this.config?.interface?.display?.options
+    const submitValue = options ? options.controlSubmitOnChange : undefined
+    return submitValue !== undefined ? submitValue : true
+  }
+
   // ---------------------------------------------------------------------------
   // DSL Methods
   // ---------------------------------------------------------------------------
@@ -776,14 +782,15 @@ module.exports = class ContentCollection {
     })
 
     if (fields.length > 0) {
-      // TODO - this to be optional when forms gets auto-submit support.
-      fields.push({
-        type: 'rplsubmitloader',
-        buttonText: 'Go',
-        loading: false,
-        autoUpdate: true,
-        styleClasses: ['app-content-collection__form-inline']
-      })
+      if (!this.getExposedControlSubmitOnChange()) {
+        fields.push({
+          type: 'rplsubmitloader',
+          buttonText: 'Go',
+          loading: false,
+          autoUpdate: true,
+          styleClasses: ['app-content-collection__form-inline']
+        })
+      }
       returnControlForm = {
         model,
         schema: {
@@ -867,6 +874,28 @@ module.exports = class ContentCollection {
       }
     }
     return returnField
+  }
+
+  // ---------------------------------------------------------------------------
+  // General Form Helpers
+  // ---------------------------------------------------------------------------
+  submitFormOnModelChange (value, model, form) {
+    let returnSubmitForm = false
+    switch (form) {
+      case 'exposedFilterForm':
+        if (this.config?.interface?.filters?.submitOnChange) {
+          if (model !== this.getDefault('ExposedFilterKeywordModel')) {
+            returnSubmitForm = true
+          }
+        }
+        break;
+      case 'controlForm':
+        if (this.getExposedControlSubmitOnChange()) {
+          returnSubmitForm = true
+        }
+        break;
+    }
+    return returnSubmitForm
   }
 
   // ---------------------------------------------------------------------------

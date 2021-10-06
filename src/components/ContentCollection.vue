@@ -18,8 +18,10 @@
       v-if="exposedFilterFormData"
       :formData="exposedFilterFormData"
       :submitHandler="exposedFilterFormSubmit"
-      :submitFormOnClear="true"
+      :fieldChangeHandler="exposedFilterFormChange"
       :scrollToMessage="false"
+      :validateOnSubmit="false"
+      :submitFormOnClear="true"
     />
     <rpl-divider v-if="exposedFilterFormData" />
     <div v-if="showSkipToResultLink" :id="getSkipToResultLinkID"></div>
@@ -37,7 +39,9 @@
           v-if="exposedControlFormData"
           :formData="exposedControlFormData"
           :submitHandler="exposedControlsFormSubmit"
+          :fieldChangeHandler="exposedControlFormChange"
           :scrollToMessage="false"
+          :validateOnSubmit="false"
           :listenForClearForm="false"
         />
       </template>
@@ -256,6 +260,16 @@ export default {
       this.syncTo(this.exposedControlFormData.model, this.state)
       this.resetPagination()
       this.updateQuery()
+    },
+    exposedFilterFormChange (value, model) {
+      if (this.dataManager.submitFormOnModelChange(value, model, 'exposedFilterForm')) {
+        this.exposedFilterFormSubmit()
+      }
+    },
+    exposedControlFormChange (value, model) {
+      if (this.dataManager.submitFormOnModelChange(value, model, 'controlForm')) {
+        this.exposedControlsFormSubmit()
+      }
     },
     updateQuery () {
       const query = this.dataManager.getDiffObject(this.state, this.defaultState)
