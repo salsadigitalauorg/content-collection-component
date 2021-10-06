@@ -18,6 +18,8 @@
       v-if="exposedFilterFormData"
       :formData="exposedFilterFormData"
       :submitHandler="exposedFilterFormSubmit"
+      :submitFormOnClear="true"
+      :scrollToMessage="false"
     />
     <rpl-divider v-if="exposedFilterFormData" />
     <div v-if="showSkipToResultLink" :id="getSkipToResultLinkID"></div>
@@ -35,6 +37,7 @@
           v-if="exposedControlFormData"
           :formData="exposedControlFormData"
           :submitHandler="exposedControlsFormSubmit"
+          :scrollToMessage="false"
           :listenForClearForm="false"
         />
       </template>
