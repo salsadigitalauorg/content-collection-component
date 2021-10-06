@@ -499,7 +499,6 @@ $app-content-collection-link-border-radius: 0 0 rem(4px) 0 !default;
             flex-direction: row;
             align-items: center;
             width: auto;
-            margin-right: 0;
             label:not(.rpl-option-button__label) {
               margin-bottom: 0;
               margin-right: $rpl-space-3;
@@ -513,7 +512,6 @@ $app-content-collection-link-border-radius: 0 0 rem(4px) 0 !default;
       .app-content-collection__form-inline + .app-content-collection__form-inline {
         @include rpl-breakpoint('m') {
           margin-left: $rpl-component-gutter-l;
-          margin-right: 0;
         }
       }
 
@@ -521,10 +519,7 @@ $app-content-collection-link-border-radius: 0 0 rem(4px) 0 !default;
         justify-content: flex-end;
       }
     }
-    &__header {
-      flex-direction: row;
-      vertical-align: top;
-    }
+
     &__info {
       margin-top: $rpl-space-4;
       align-self: start;
