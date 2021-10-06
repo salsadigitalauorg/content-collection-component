@@ -36,7 +36,7 @@ export default class HealthContentCollection extends ContentCollection {
     return {
       icon: (options.icon) ? this.getVhSearchResultValue(options.icon, item) : null,
       title: (options.title) ? this.getVhSearchResultValue(options.title, item) : null,
-      link: { linkText: link, linkUrl: link },
+      link: { linkText: link, linkUrl: link.path },
       subTop: (options.subTop) ? this.getVhSearchResultValue(options.subTop, item) : null,
       summary: (options.summary) ? this.getVhSearchResultValue(options.summary, item) : null,
       subBottom: (options.subBottom) ? this.getVhSearchResultValue(options.subBottom, item) : null
