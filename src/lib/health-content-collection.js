@@ -18,7 +18,7 @@ export default class HealthContentCollection extends ContentCollection {
   mapResult (item) {
     let mappedResult = null
     const _source = item._source
-    const link = this.getLocalisedLink(_source.url)
+    const link = this.getLocalisedLink(_source.url).path
 
     switch (this.getDisplayResultComponentType()) {
       case 'vh-search-result':
