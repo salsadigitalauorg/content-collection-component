@@ -1,5 +1,11 @@
 # content-collection
 
+Build using node v 14.
+
+```
+nvm use 14
+```
+
 ## Project setup
 ```
 npm install
