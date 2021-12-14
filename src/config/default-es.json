@@ -1,7 +1,7 @@
 {
-  "SEARCH_URL": "elastic.sdp2.sdp.vic.gov.au",
+  "SEARCH_URL": "sdp1-b.elastic.sdp.vic.gov.au",
   "SEARCH_AUTH_USERNAME": "",
   "SEARCH_AUTH_PASSWORD": "",
-  "SEARCH_INDEX": "elasticsearch_index_nonprod_node",
+  "SEARCH_INDEX": "elasticsearch_index_drupal_node",
   "SEARCH_HASH": "a83890f7a31dea14e1ae83c6f0afacca"
 }
