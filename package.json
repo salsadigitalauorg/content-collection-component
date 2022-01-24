@@ -6,6 +6,8 @@
     "serve": "vue-cli-service serve",
     "build": "vue-cli-service build",
     "docs": "vue-cli-service build; rm -rf docs; mv dist docs",
+    "validate": "node schema/validate.js",
+    "example": "npm run validate schema/test.json",
     "postinstall": "patch-package"
   },
   "dependencies": {
