@@ -10,6 +10,7 @@
       "placeholder": "Enter keyword(s)"
     },
     "filters": {
+      "submitOnChange": false,
       "submit": {
         "visibility": "visible",
         "label": "Apply change"

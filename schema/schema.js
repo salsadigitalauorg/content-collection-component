@@ -4,6 +4,10 @@
  * Version: Draft
  *
  * Tags:
+ * @optional    - Field is not required
+ * @opt_default - The default value used on optional fields when none is defined.
+ * @required    - Field must be included if using feature
+ * @req_default - The default value to set required fields if no other value is used.
  * @discuss     - Need discussion.
  * @drupal      - Possible implementation for the Drupal Content Collection form.
  * @drupal_src  - The data source to populate the form field.
@@ -17,18 +21,21 @@
 const schema = {
   /**
    * Title
+   * @optional
    * @drupal [Field] Text input
    * @implemented
    */
   "title": "Search",
   /**
    * Description
+   * @optional
    * @drupal [Field] Text area input
    * @implemented
    */
   "description": "",
   /**
    * Call to Action
+   * @optional
    * @drupal [Field] Link field with `text` and `url` fields.
    * @implemented
    */
@@ -39,8 +46,8 @@ const schema = {
   /**
    * Data Connection Type
    * Default to 'elastic-search', but available here to allow for other endpoints.
-   * @drupal Not available
    * @unavailable
+   * @drupal Not available
    * @proposal We replace this with the "connection" option.
    */
   "dataConnectionType": "elastic-search",
@@ -61,6 +68,7 @@ const schema = {
    * These rules are set by default and, with the exception of
    * sort and itemsToLoad, are unable to be changed via an exposed user form.
    * ---------------------------------------------------------------------------
+   * @optional
    */
   "internal": {
     /**
@@ -71,6 +79,7 @@ const schema = {
     /**
      * Content Ids
      * For displaying user defined content - accepts node ids (not UUIDs).
+     * @optional
      * @drupal [Field] Multiple entity references
      * @drupal_src Any nodes
      * @implemented
@@ -79,6 +88,7 @@ const schema = {
     /**
      * Content Types
      * For displaying content by type
+     * @optional
      * @drupal [Field] Single option select
      * @drupal_src Available content types
      * @implemented
@@ -87,6 +97,7 @@ const schema = {
     /**
      * Content Fields
      * For filtering content by various field values
+     * @optional
      * @drupal This field only supports 2 hard-coded options: Topics, Tags
      * @implemented
      */
@@ -111,6 +122,7 @@ const schema = {
     /**
      * Include Current Page
      * When used like a "Related articles" list, we may want to exclude current page.
+     * @optional
      * @drupal Not available
      * @implemented
      */
@@ -118,6 +130,7 @@ const schema = {
     /**
      * Exclude Ids
      * Option to exclude ids from results
+     * @optional
      * @drupal Not available
      * @unavailable
      */
@@ -125,6 +138,7 @@ const schema = {
     /**
      * Date filter
      * For filtering content by date
+     * @optional
      * @drupal Not available
      * @implemented
      */
@@ -132,6 +146,7 @@ const schema = {
       /**
        * Field: Criteria
        * Options: "today", "this_week", "this_month", "this_year", "today_and_future", "past", "range"
+       * @required
        * @drupal [Field] Select a single option
        * @drupal_src hard coded in option field
        * @implemented
@@ -140,6 +155,7 @@ const schema = {
       /**
        * Field: Start Date
        * Name of field from which to test the date range start
+       * @required
        * @drupal [Field] Select a single option
        * @drupal_src search api fields
        * @implemented
@@ -148,6 +164,7 @@ const schema = {
       /**
        * Field: End Date
        * Name of field from which to test the date range end
+       * @required
        * @drupal [Field] Select a single option
        * @drupal_src search api fields
        * @implemented
@@ -155,14 +172,16 @@ const schema = {
       "endDateField": "field_profile_womens_inducted_date",
       /**
        * Field: Range Start
-       * Start of the range test - only shows if critera = "range"
+       * Start of the range test
+       * @required - if criteria is 'range'
        * @drupal [Field] Date
        * @implemented
        */
       "dateRangeStart": "2021-01-01T11:28:23+10:00",
       /**
        * Field: Range End
-       * End of the range test - only shows if critera = "range"
+       * End of the range test
+       * @required - if criteria is 'range'
        * @drupal [Field] Date
        * @implemented
        */
@@ -171,6 +190,7 @@ const schema = {
     /**
      * Sort
      * If interface.display.sort is available with options, this will be ignored.
+     * @optional
      * @drupal [Field] Multiple field collections
      * @implemented
      */
@@ -186,14 +206,17 @@ const schema = {
     /**
      * Items to Load
      * If interface.display.pagination is available with options, this will be ignored.
+     * @optional
+     * @opt_default 12
      * @drupal [Field] Number
      * @implemented
      */
-    "itemsToLoad": 10,
+    "itemsToLoad": 12,
     /**
      * -------------------------------------------------------------------------
      * Complex - Pure Elasticsearch DSL Query
      * POST to /search-api - Build functionality in search-api to accept POSTs.
+     * @optional
      * @drupal Not available
      * @implemented
      * -------------------------------------------------------------------------
@@ -224,6 +247,7 @@ const schema = {
    * Where "type" is used, nuxt-tide will allow for defining custom
    * functions to extend the existing functionality.
    * ---------------------------------------------------------------------------
+   * @optional
    */
   "interface": {
     /**
@@ -231,6 +255,8 @@ const schema = {
      * Store the state of the user interactions in the URL.
      * Allows for bookmarking or sharing individual searches or result pages.
      * Only one Content Collection can use this per page.
+     * @optional
+     * @opt_default false
      * @implemented
      * @proposal
      */
@@ -238,35 +264,44 @@ const schema = {
     /**
      * Keyword filter
      * User options for filtering by keywords.
+     * @optional
      */
     "keyword": {
       /**
        * Type
        * Allows for default "basic" functionality (phrase_match), or custom keyword configurations in FE code.
-       * @drupal Not available - defaults to "basic"
+       * @required
+       * @req_default "basic"
+       * @drupal Not available
        * @nuxthook Can accept other types
        * @implemented
        */
       "type": "basic",
       /**
        * Label
+       * @optional
+       * @opt_default "Search by keyword"
        * @drupal [Field] Single text
        * @implemented
        */
       "label": "Search by keyword",
       /**
        * Placeholder
+       * @optional
+       * @opt_default "Enter keywords"
        * @drupal [Field] Single text
        * @implemented
        */
-      "placeholder": "Enter keyword(s)",
+      "placeholder": "Enter keywords",
       /**
        * Fields
+       * @optional
+       * @opt_default ["title", "body", "summary_processed", "field_landing_page_summary", "field_paragraph_summary", "field_page_intro_text", "field_paragraph_body"]
        * @drupal [Field] Select multiple option
        * @drupal_src search api fields
        * @implemented
        */
-      "fields": [ "title", "body", "summary_processed" ]
+      "fields": ["title", "body", "summary_processed", "field_landing_page_summary", "field_paragraph_summary", "field_page_intro_text", "field_paragraph_body"]
     },
     /**
      * Advanced search filters
@@ -291,25 +326,33 @@ const schema = {
        * without needing to trigger the submit button.
        * If false, submit button will need to be pressed before search results update.
        * In both cases, the submit button will still be visible and functional.
+       * @optional
+       * @opt_default false
        * @drupal [Field] Single checkbox
-       * @unavailable
+       * @implemented
        */
       "submitOnChange": false,
       /**
        * Toggle search fields label
        * @drupal [Field] Single text
-       * @implemented
+       * @unavailable
+       * @proposal Exposed filters currently use a regular form instead of the
+       *           SearchForm. This means the expand button no longer exists.
+       *           Can we remove this option?
        */
       "label": "Refine search",
       /**
        * Submit button
        * The button that appears at the end of the advanced search filters.
+       * @optional
        */
       "submit": {
         /**
          * Visibility
          * Show or hide the submit button.
          * Options: "visible", "hidden", "when-needed"
+         * @required
+         * @req_default "visible"
          * @drupal [Field] Single option select
          * @drupal_src hard-coded options
          * @implemented
@@ -318,16 +361,25 @@ const schema = {
         /**
          * Label
          * Visible label for the submit button
+         * @optional
+         * @opt_default "Filter results"
          * @drupal [Field] Single text
          * @implemented
          */
         "label": "Apply change"
       },
+      /**
+       * Clear button
+       * The button that appears at the end of the advanced search filters.
+       * @optional
+       */
       "clearForm": {
         /**
          * Visibility
          * Show or hide the clear form button.
          * Options: "visible", "hidden", "when-needed"
+         * @required
+         * @req_default "visible"
          * @drupal [Field] Single option select
          * @drupal_src hard-coded options
          * @implemented
@@ -336,6 +388,8 @@ const schema = {
         /**
          * Label
          * Visible label for the clear search button
+         * @optional
+         * @opt_default "Clear search filters"
          * @drupal [Field] Single text
          * @implemented
          */
@@ -363,6 +417,8 @@ const schema = {
            * Type
            * Default "basic". If a custom type, then a custom hook will receive
            * this object to provide further processing.
+           * @required
+           * @req_default "basic"
            * @drupal Not available
            * @nuxthook Can accept other types
            * @implemented
@@ -375,6 +431,7 @@ const schema = {
            * https://vue-generators.gitbook.io/vue-generators/fields/field_properties
            * JSON schema will not support functions (e.g. validators).
            * For validators, or complex fields, a custom type should be used.
+           * @required
            * @drupal There should be some preset options for filters that will populate this field.
            * @implemented
            */
@@ -383,30 +440,35 @@ const schema = {
              * VFG: Model
              * This will be used in the URL query string and as a fallback
              * if "elasticsearch-field" is undefined.
+             * @required
              * @drupal Not available
              */
             "model": "field_year",
             /**
              * VFG: Type
              * Type of form field to use.
+             * @required
              * @drupal Not available - default to "rplselect"
              */
             "type": "rplselect",
             /**
              * VFG: Label
              * The label of the field
+             * @required
              * @drupal Single text field
              */
             "label": "Field label",
             /**
              * VFG: Hint
              * The Hint text below the field
+             * @optional
              * @drupal Not available
              */
             "hint": "Field hint text",
             /**
              * VFG: Placholder
              * The placholder text to display on the field
+             * @optional
              * @drupal Single text field
              */
             "placeholder": "Field placeholder",
@@ -415,6 +477,7 @@ const schema = {
              * The values of the field. For rplselect, if this is defined,
              * then "elasticsearch-aggregation" should = false, as the values
              * will come from the results.
+             * @required
              * @drupal Multiple values with key (name) value (id)
              * @drupal_src Either a taxonomy or user defined
              */
@@ -423,6 +486,7 @@ const schema = {
           /**
            * Additional Classes
            * Classes to add to the form field for styling.
+           * @optional
            * @drupal Not available
            * @implemented
            */
@@ -431,6 +495,8 @@ const schema = {
            * ES Field
            * The ES Field on which to query elasticsearch against.
            * If not set, it will assume the options.model value is the ES field.
+           * @optional
+           * @opt_default options.model value
            * @drupal [Field] Select a single option
            * @drupal_src search api fields
            * @implemented
@@ -441,6 +507,8 @@ const schema = {
            * Enable aggregation for a field.
            * If true, the form field values are populated from the result's aggregated values.
            * If false, form field will use static values defined in option.values.
+           * @optional
+           * @opt_default false
            * @drupal [Field] Checkbox
            * @implemented
            */
@@ -448,17 +516,19 @@ const schema = {
           /**
            * ES Aggregation Order
            * Set the order ("asc" / "desc") for aggregation results. Defaults to "asc".
+           * @optional
+           * @opt_default "asc"
            * @drupal Not available
            * @implemented
-           * @proposal
            */
           "elasticsearch-aggregation-order": "asc",
           /**
            * ES Aggregation Size
            * Set the number of aggregated results to return. Defaults to 30.
+           * @optional
+           * @opt_default 30
            * @drupal Not available
            * @implemented
-           * @proposal
            */
           "elasticsearch-aggregation-size": 30
         },
@@ -475,11 +545,15 @@ const schema = {
     /**
      * Display of results
      * Options for how the results should display.
+     * @optional
      */
     "display": {
       /**
        * Type
-       * The type of listing style to use. Default is "grid".
+       * The type of listing style to use.
+       * While this is a required field, it has no proper implementation at the moment.
+       * @required
+       * @req_default "grid"
        * @drupal Not available - defaults to "grid"
        * @nuxthook Can accept other types
        * @implemented
@@ -488,6 +562,7 @@ const schema = {
       /**
        * Options
        * The configuration options for the type of display.
+       * @optional
        */
       "options": {
         /**
@@ -496,6 +571,7 @@ const schema = {
          * Supports 2 tokens:
          * - {range} - The current range of results E.g. 1-12
          * - {count} - The total count of results
+         * @optional
          * @drupal Single text defaults to "Displaying {range} of {count} results"
          * @implemented
          */
@@ -503,6 +579,7 @@ const schema = {
         /**
          * Loading text
          * Text to display when search results are loading.
+         * @optional
          * @drupal Single text defaults to "Loading"
          * @implemented
          */
@@ -510,6 +587,8 @@ const schema = {
         /**
          * No results text
          * Text to display when no results were returned.
+         * @optional
+         * @opt_default "Sorry! We couldn't find any matches" - as per SearchResultsLayout.vue default
          * @drupal Single text defaults to "Sorry! We couldn't find any matches"
          * @implemented
          */
@@ -517,6 +596,8 @@ const schema = {
         /**
          * Error text
          * Text to display when an error occurs.
+         * @optional
+         * @opt_default "Search isn't working right now, please try again later." - as per SearchResultsLayout.vue default
          * @drupal Single text defaults to "Search isn't working right now, please try again later."
          * @implemented
          */
@@ -524,6 +605,7 @@ const schema = {
         /**
          * Sort
          * The configuration options for the exposed user sort.
+         * @optional
          * @drupal Not available - defaults to "null"
          * @nuxthook Can be extended
          * @implemented
@@ -531,7 +613,9 @@ const schema = {
         "sort": {
           /**
            * Type
-           * The type of sort widget to use. Default is "field".
+           * The type of sort widget to use.
+           * @required
+           * @req_default "field"
            * @nuxthook Can accept other types (e.g. "table")
            * @implemented
            */
@@ -539,6 +623,7 @@ const schema = {
           /**
            * Values
            * The exposed field values to display to a user. First value is used by default.
+           * @required
            * @implemented
            */
           "values": [
@@ -552,6 +637,7 @@ const schema = {
         /**
          * Items to load
          * The configuration options for the exposed items to load.
+         * @optional
          * @drupal Not available - defaults to "null"
          * @nuxthook Can be extended
          * @implemented
@@ -559,7 +645,9 @@ const schema = {
         "itemsToLoad": {
           /**
            * Type
-           * The type of items to load widget to use. Default is "field".
+           * The type of items to load widget to use.
+           * @required
+           * @req_default "field"
            * @nuxthook Can accept other types
            * @implemented
            */
@@ -567,6 +655,7 @@ const schema = {
           /**
            * Values
            * The exposed field values to display to a user. First value is used by default.
+           * @required
            * @implemented
            */
           "values": [
@@ -579,14 +668,17 @@ const schema = {
         /**
          * Pagination
          * The configuration options for the exposed pagination.
+         * @optional
          * @nuxthook Can be extended
          * @implemented
          */
         "pagination": {
           /**
            * Type
-           * The type of pagination widget to use. Default is "numbers".
-           * @drupal Not available - defaults to "numbers"
+           * The type of pagination widget to use.
+           * @required
+           * @req_default "numbers"
+           * @drupal Not available
            * @nuxthook Can accept other types (e.g. "load-more" / "infinite-scroll")
            * @implemented
            */
@@ -596,14 +688,17 @@ const schema = {
       /**
        * Result component
        * The configuration options for displaying the results.
+       * @optional
        * @nuxthook Can be extended
        * @implemented
        */
       "resultComponent": {
         /**
          * Type
-         * The type of result component to use. Default is "card".
+         * The type of result component to use.
          * Supports options = "card" / "searh-result"
+         * @required
+         * @req_default "card"
          * @drupal Not available - defaults to "card"
          * @nuxthook Can accept other types
          * @implemented
@@ -612,7 +707,9 @@ const schema = {
         /**
          * Style
          * The style of the card to display. Only for "card" type.
-         * @drupal [Field] Single option - "no-image", "thumbnail", "profile"
+         * @optional
+         * @opt_default "noImage"
+         * @drupal [Field] Single option - "noImage", "thumbnail", "profile"
          * @implemented
          */
         "style": "thumbnail"
