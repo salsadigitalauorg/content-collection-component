@@ -401,10 +401,12 @@ const schema = {
        * E.g. Desktop 1 field = full width, 2 fields = 50% width, 3 fields = 33%
        * Automatic arrangement can be disabled if a custom form has a special
        * field layout requirement.
+       * @optional
+       * @opt_default false
        * @drupal Not available
-       * @unavailable
+       * @implemented
        */
-      "defaultStyling": true,
+      "defaultStyling": false,
       /**
        * Fields
        * The custom fields displayed within advanced search filters.

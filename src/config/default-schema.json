@@ -19,6 +19,7 @@
         "visibility": "visible",
         "label": "Clear search"
       },
+      "defaultStyling": true,
       "fields": [
         {
           "type": "basic",
@@ -33,7 +34,7 @@
               { "id": "news", "name": "News" }
             ]
           },
-          "additionalClasses": [ "app-content-collection__form-col-3" ],
+          "additionalClasses": [],
           "elasticsearch-field": "type",
           "elasticsearch-aggregation": false
         },
@@ -47,7 +48,7 @@
             "placeholder": "Select some tags",
             "values": []
           },
-          "additionalClasses": [ "app-content-collection__form-col-3" ],
+          "additionalClasses": [],
           "elasticsearch-field": "field_tags_name",
           "elasticsearch-aggregation": true
         },
@@ -61,7 +62,7 @@
             "placeholder": "Select a topic",
             "values": []
           },
-          "additionalClasses": [ "app-content-collection__form-col-3" ],
+          "additionalClasses": [],
           "elasticsearch-field": "field_topic_name",
           "elasticsearch-aggregation": true
         }
