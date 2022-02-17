@@ -1018,7 +1018,7 @@ module.exports = class ContentCollection {
 
   getAggregatedFilterValues (buckets, stateValue, dataField) {
     let returnValues = []
-    let hideCount = (dataField['elasticsearch-aggregation-show-count'] == false) ? true : false
+    let hideCount = (dataField['elasticsearch-aggregation-show-count'] === false)
     if (buckets.length > 0) {
       // Has Aggregations
       returnValues = buckets.map(({ key, doc_count: count }) => {
