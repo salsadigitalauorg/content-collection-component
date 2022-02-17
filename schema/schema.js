@@ -532,7 +532,16 @@ const schema = {
            * @drupal Not available
            * @implemented
            */
-          "elasticsearch-aggregation-size": 30
+          "elasticsearch-aggregation-size": 30,
+          /**
+           * ES Aggregation Hide Counts
+           * Suppress showing the count number of aggregated values in filter select lists.
+           * @optional
+           * @opt_default true
+           * @drupal Not available
+           * @implemented
+           */
+           "elasticsearch-aggregation-show-count": true
         },
         /**
          * Example of a custom type that will use a hook to populate.
