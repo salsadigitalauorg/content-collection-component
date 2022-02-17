@@ -294,6 +294,10 @@
                   "elasticsearch-aggregation-size": {
                     "type": "number",
                     "description": "The number of aggregated results to return."
+                  },
+                  "elasticsearch-aggregation-show-count": {
+                    "type": "boolean",
+                    "description": "Determine if aggregation count should be displayed. Defaults to true."
                   }
                 },
                 "additionalProperties": false,
