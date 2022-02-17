@@ -64,7 +64,8 @@
           },
           "additionalClasses": [],
           "elasticsearch-field": "field_topic_name",
-          "elasticsearch-aggregation": true
+          "elasticsearch-aggregation": true,
+          "elasticsearch-aggregation-show-count": false
         }
       ]
     },
