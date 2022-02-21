@@ -8,7 +8,11 @@ import VhSearchResult from './components/VhSearchResult.vue'
 
 Vue.config.productionTip = false
 
-Vue.use(RplGlobal, {})
+Vue.use(RplGlobal, {
+  rplMarkup: {
+    plugins: []
+  }
+})
 Vue.component('vh-search-result', VhSearchResult)
 
 // Mock Tide Search API.
