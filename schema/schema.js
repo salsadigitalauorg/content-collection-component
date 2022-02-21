@@ -454,6 +454,15 @@ const schema = {
              */
             "type": "rplselect",
             /**
+             * RplSelect: Multiselect
+             * Option to toggle between single or multiselect mode.
+             * Only available if "type" = "rplselect".
+             * @optional
+             * @opt_default false
+             * @drupal Not available
+             */
+            "multiselect": false,
+            /**
              * VFG: Label
              * The label of the field
              * @required
