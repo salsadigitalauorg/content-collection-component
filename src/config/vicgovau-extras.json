@@ -1,0 +1,47 @@
+{
+  "title": "Events (custom result)",
+  "internal": {
+    "contentTypes": ["event"],
+    "sort": [
+      { "field": "field_event_date_start_value", "direction": "asc" }
+    ]
+  },
+  "interface": {
+    "display": {
+      "type": "grid",
+      "resultComponent": {
+        "type": "vh-search-result",
+        "options": {
+          "icon": {
+            "type": "icon",
+            "symbol": "calendar"
+          },
+          "title": {
+            "type": "text",
+            "field": "title"
+          },
+          "subTop": {
+            "type": "formatted",
+            "fields": [
+              {
+                "type": "date",
+                "field": "field_event_date_start_value",
+                "format": "DD MMM YYYY"
+              },
+              {
+                "type": "date",
+                "field": "field_event_date_end_value",
+                "format": "DD MMM YYYY"
+              }
+            ],
+            "format": "{field_event_date_start_value} - {field_event_date_end_value}"
+          },
+          "summary": {
+            "type": "text",
+            "field": "field_landing_page_summary"
+          }
+        }
+      }
+    }
+  }
+}

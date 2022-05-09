@@ -1,0 +1,23 @@
+{
+  "title": "Events from this Month",
+  "internal": {
+    "contentTypes": ["event"],
+    "dateFilter": {
+      "criteria": "this_month",
+      "startDateField": "field_event_date_start_value",
+      "endDateField": "field_event_date_end_value"
+    },
+    "sort": [
+      { "field": "field_event_date_start_value", "direction": "asc" }
+    ]
+  },
+  "interface": {
+    "display": {
+      "type": "grid",
+      "resultComponent": {
+        "type": "card",
+        "style": "noImage"
+      }
+    }
+  }
+}

@@ -1,5 +1,5 @@
 {
-  "title": "Content Collection",
+  "title": "Search",
   "interface": {
     "keepState": true,
     "skipToResultLink": true,
@@ -21,23 +21,6 @@
       },
       "defaultStyling": true,
       "fields": [
-        {
-          "type": "basic",
-          "options": {
-            "model": "type",
-            "type": "rplselect",
-            "label": "Type",
-            "hint": "The content type to filter by",
-            "placeholder": "Select type",
-            "values": [
-              { "id": "landing_page", "name": "Landing Page" },
-              { "id": "news", "name": "News" }
-            ]
-          },
-          "additionalClasses": [],
-          "elasticsearch-field": "type",
-          "elasticsearch-aggregation": false
-        },
         {
           "type": "basic",
           "options": {
@@ -89,8 +72,8 @@
         "itemsToLoad": {
           "type": "field",
           "values": [
-            { "name": "12", "value": 12 },
-            { "name": "24", "value": 24 }
+            { "name": "10", "value": 10 },
+            { "name": "20", "value": 20 }
           ]
         },
         "pagination": {
@@ -98,7 +81,7 @@
         }
       },
       "resultComponent": {
-        "type": "card"
+        "type": "search-result"
       }
     }
   }

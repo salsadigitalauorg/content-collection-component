@@ -1,0 +1,58 @@
+{
+  "title": "Filter by Content Type",
+  "interface": {
+    "filters": {
+      "submitOnChange": true,
+      "fields": [
+        {
+          "type": "basic",
+          "options": {
+            "model": "type",
+            "type": "rplselect",
+            "label": "Type",
+            "hint": "The content type to filter by",
+            "placeholder": "Select type",
+            "values": [
+              { "id": "landing_page", "name": "Landing Page" },
+              { "id": "news", "name": "News" },
+              { "id": "grant", "name": "Grants" },
+              { "id": "event", "name": "Event" }
+            ]
+          },
+          "additionalClasses": [ "app-content-collection__form-col-3" ],
+          "elasticsearch-field": "type"
+        }
+      ]
+    },
+    "display": {
+      "type": "grid",
+      "options": {
+        "resultsCountText": "Displaying {range} of {count} results",
+        "loadingText": "Loading",
+        "noResultsText": "Sorry! We couldn't find any matches",
+        "errorText": "Search isn't working right now, please try again later.",
+        "sort": {
+          "type": "field",
+          "values": [
+            { "name": "Newest", "value": [ { "field": "created", "direction": "desc" } ] },
+            { "name": "Oldest", "value": [ { "field": "created", "direction": "asc" } ] }
+          ]
+        },
+        "itemsToLoad": {
+          "type": "field",
+          "values": [
+            { "name": "12", "value": 12 },
+            { "name": "24", "value": 24 }
+          ]
+        },
+        "pagination": {
+          "type": "numbers"
+        }
+      },
+      "resultComponent": {
+        "type": "card",
+        "style": "thumbnail"
+      }
+    }
+  }
+}
