@@ -1,5 +1,8 @@
 {
   "title": "Search",
+  "internal": {
+    "managedSort": true
+  },
   "interface": {
     "keepState": true,
     "skipToResultLink": true,

@@ -1,11 +1,14 @@
 {
   "title": "Events from this Month",
   "internal": {
+    "managedSort": true,
     "contentTypes": ["event"],
     "dateFilter": {
-      "criteria": "this_month",
+      "criteria": "range",
       "startDateField": "field_event_date_start_value",
-      "endDateField": "field_event_date_end_value"
+      "endDateField": "field_event_date_end_value",
+      "dateRangeStart": "2020-01-01T00:00:00.000Z",
+      "dateRangeEnd": "2022-01-01T00:00:00.000Z"
     },
     "sort": [
       { "field": "field_event_date_start_value", "direction": "asc" }

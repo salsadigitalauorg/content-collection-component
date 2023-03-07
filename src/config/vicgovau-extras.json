@@ -1,6 +1,7 @@
 {
   "title": "Events (custom result)",
   "internal": {
+    "managedSort": true,
     "contentTypes": ["event"],
     "sort": [
       { "field": "field_event_date_start_value", "direction": "asc" }

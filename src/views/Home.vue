@@ -22,6 +22,11 @@
           :class="{ 'controls__tab-btn--selected': tab === 2 }"
           @click="tab = 2"
         >Reference schema</button>
+        <button
+          class="controls__tab-btn"
+          :class="{ 'controls__tab-btn--selected': tab === 3 }"
+          @click="tab = 3"
+        >About</button>
       </div>
       <div class="controls__tab" v-if="tab === 1">
         <div class="controls__grid">
@@ -66,6 +71,13 @@
               <prism-editor class="code-editor" v-model="validationSchema" :highlight="highlighter" line-numbers :readonly="true"></prism-editor>
             </label>
           </div>
+        </div>
+      </div>
+      <div class="controls__tab" v-if="tab === 3">
+        <div class="controls__full-inner">
+          <div>Updated 8th March 2023</div>
+          <div>Content Collection from ripple 1.33.0</div>
+          <div>Includes modifications for the "Extras - Custom Results" card mapping.</div>
         </div>
       </div>
     </div>
@@ -301,11 +313,19 @@ export default {
 
   &__tab-btn {
     border: 1px;
-    background-color: grey;
+    background-color: lightgrey;
     padding: 4px;
+
+    &:hover {
+      background-color: ghostwhite;
+    }
 
     &--selected {
       background-color: white;
+
+      &:hover {
+        background-color: white;
+      }
     }
   }
 

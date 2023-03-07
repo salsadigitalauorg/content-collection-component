@@ -1,5 +1,8 @@
 {
   "title": "Filter by Content Type",
+  "internal": {
+    "managedSort": true
+  },
   "interface": {
     "filters": {
       "submitOnChange": true,
